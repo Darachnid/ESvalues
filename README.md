@@ -8,7 +8,7 @@ ESvalues/
 
 # To Do:
 
-1. Read feedback from Cooper.
+1. ~~Read feedback from Cooper.~~
 
 1. Literature Review
     - What questions are asked by studies that use surveys to understand Ecosystem Service (ES) values?
