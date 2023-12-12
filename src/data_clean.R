@@ -58,6 +58,10 @@ data <- read_csv("data/Data.csv") |>
                                    "$75,001 to $100,000 per year",
                                     "More than $100,000 per year",
                                     "Prefer Not to Answer"))) |>
-  mutate(frac_children = children_in_household/(children_in_household+adults_in_household))
+  mutate(frac_children = children_in_household/(children_in_household+adults_in_household)) 
+
+
+## Save R object 
+saveRDS(data, file = "out/clean_data.rds")
 
 
