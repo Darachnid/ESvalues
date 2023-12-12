@@ -18,17 +18,17 @@ ESvalues/
 1. Initial Data Exploration
     - Summary Stats
       - What are the distributions of:
-        - Demographics
-          - Gender
-          - Birth Year
-          - Race
-          - Years in Community
-          - Politics
-          - Adults in Home
-          - Children in Home
-          - Fraction of household members that are children
-          - Income
-          - Education
+        - ~~Demographics~~
+          - ~~Gender~~
+          - ~~Birth Year~~
+          - ~~Race~~
+          - ~~Years in Community~~
+          - ~~Politics~~
+          - ~~Adults in Home~~
+          - ~~Children in Home~~
+          - ~~Fraction of household members that are children~~
+          - ~~Income~~
+          - ~~Education~~
         - Perception of Environmental Quality
         - Values
           - Mean score for each ES
