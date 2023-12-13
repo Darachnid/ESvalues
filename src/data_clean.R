@@ -1,6 +1,9 @@
 library(tidyverse)
+library(tigris)
+library(sf)
 
 setwd(here::here())
+
 
 data <- read_csv("data/Data.csv") |>
   filter(!is.na(year_in_community)) |>
@@ -61,8 +64,25 @@ data <- read_csv("data/Data.csv") |>
                                     "Prefer Not to Answer"))) |>
   mutate(frac_children = children_in_household/(children_in_household+adults_in_household)) 
 
+  
+## Geocode County Data
+zip_data <- tigris::zctas(year = 2020, cb = TRUE, class = "sf")
+county_data <- tigris::counties(cb = TRUE, class = "sf")
+  
+merged_data <- merge(data, zip_data, by.x = "zipcode", by.y = "ZCTA5CE20", all.x = TRUE)
+
+# Convert merged data to an sf object
+merged_data_sf <- st_as_sf(merged_data)
+
+# Perform a spatial join to match ZIP codes with counties
+geocoded_data <- st_join(merged_data_sf, county_data, join = st_within)
+
+geocoded_data <- geocoded_data[,c(1:36, 48)]
 
 ## Save R object 
 saveRDS(data, file = "out/clean_data.rds")
+
+## Save R object 
+saveRDS(geocoded_data, file = "out/geocoded_data.rds")
 
 
