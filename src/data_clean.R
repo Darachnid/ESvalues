@@ -4,6 +4,7 @@ setwd(here::here())
 
 data <- read_csv("data/Data.csv") |>
   filter(!is.na(year_in_community)) |>
+  mutate(zipcode = paste0("0", as.character(zipcode))) |>
   mutate(across(starts_with("val"), ~case_when(
     . == "Unimportant" ~ 1,
     . == "Slight Importance" ~ 2,
