@@ -79,8 +79,8 @@ county_data |> pivot_longer(cols = starts_with("count_"),
        subtitle = "number labels and transparency indicate response counts") +
   guides(alpha = "none")
 
-ggsave("out/maps/map__ES_means_per_county.pdf")
-ggsave("out/maps/map__ES_means_per_county.png", bg = "white")
+ggsave("out/maps/map__ES_means_per_county.pdf", scale = 1.5)
+ggsave("out/maps/map__ES_means_per_county.png", bg = "white", scale = 1.5)
 
 
 
