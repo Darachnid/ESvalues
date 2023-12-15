@@ -1,0 +1,2666 @@
+---
+title: "AoP_Analyses_Final"
+author: "Brianna Shaughnessy"
+date: "11/2/2021"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+##R packages required for these analyses and their citations
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+#Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686
+library(car)
+# John Fox and Sanford Weisberg (2019). An {R} Companion to Applied Regression, Third Edition. Thousand Oaks CA: Sage. URL: https://socialsciences.mcmaster.ca/jfox/Books/Companion/
+library(ggplot2)
+# H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
+library(emmeans)
+#  Russell V. Lenth (2021). emmeans: Estimated Marginal Means, aka Least-Squares Means. R package version 1.6.2-1. https://CRAN.R-project.org/package=emmeans
+library(dplyr)
+# Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2021). dplyr: A Grammar of Data Manipulation. R package version 1.0.5. https://CRAN.R-project.org/package=dplyr
+library(multcompView)
+# Spencer Graves, Hans-Peter Piepho and Luciano Selzer with help from Sundar Dorai-Raj (2019). multcompView: Visualizations of Paired Comparisons. R package version 0.1-8. https://CRAN.R-project.org/package=multcompView
+library(kableExtra)
+# Hao Zhu (2021). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R package version 1.3.4. https://CRAN.R-project.org/package=kableExtra
+library(DHARMa)
+#  Florian Hartig (2021). DHARMa: Residual Diagnostics for Hierarchical (Multi-Level / Mixed) Regression Models. R package version 0.4.3. https://CRAN.R-project.org/package=DHARMa
+library(betareg)
+#Cribari-Neto F, Zeileis A (2010). “Beta Regression in R.” _Journal of Statistical Software_, *34*(2), 1-24. doi: 10.18637/jss.v034.i02 (URL: https://doi.org/10.18637/jss.v034.i02).
+library(aod)
+# Lesnoff, M., Lancelot, R. (2012). aod: Analysis of Overdispersed Data. R package version 1.3.1, URL http://cran.r-project.org/package=aod
+library(MASS)
+#Venables, W. N. & Ripley, B. D. (2002) Modern Applied Statistics with S.Fourth Edition. Springer, New York. ISBN 0-387-95457-0
+library(brant)
+# Benjamin Schlegel and Marco Steenbergen (2020). brant: Test for Parallel Regression Assumption. R package version 0.3-0. https://CRAN.R-project.org/package=brant
+library(patchwork)
+#Thomas Lin Pedersen (2020). patchwork: The Composer of Plots. R package version 1.1.1. https://CRAN.R-project.org/package=patchwork
+library(rstatix)
+# Alboukadel Kassambara (2021). rstatix: Pipe-Friendly Framework for Basic Statistical Tests. R package version 0.7.0. https://CRAN.R-project.org/package=rstatix
+library(RVAideMemoire)
+#  Maxime Hervé (2021). RVAideMemoire: Testing and Plotting Procedures for Biostatistics. R package version 0.9-80. https://CRAN.R-project.org/package=RVAideMemoire
+library(ordinal)
+#  Christensen, R. H. B. (2019). ordinal - Regression Models for Ordinal Data. R package version 2019.12-10. https://CRAN.R-project.org/package=ordinal.
+library(xtable)
+#David B. Dahl, David Scott, Charles Roosen, Arni Magnusson and Jonathan Swinton (2019). xtable: Export Tables to LaTeX or HTML. R package version 1.8-4. https://CRAN.R-project.org/package=xtable
+library(cowplot)
+#Claus O. Wilke (2020). cowplot: Streamlined Plot Theme and Plot Annotations for 'ggplot2'. R package version 1.1.1. https://CRAN.R-project.org/package=cowplot
+library(ggeffects)
+#Lüdecke D (2018). “ggeffects: Tidy Data Frames of Marginal Effects from Regression Models.” _Journal of Open Source Software_, *3*(26), 772. doi: 10.21105/joss.00772 (URL: https://doi.org/10.21105/joss.00772).
+library(effects)
+# John Fox and Sanford Weisberg (2019). An R Companion to Applied Regression, 3rd Edition. Thousand Oaks, CA <https://socialsciences.mcmaster.ca/jfox/Books/Companion/index.html>
+library(FSA)
+#Ogle, D.H., J.C. Doll, P. Wheeler, and A. Dinno. 2022. FSA: Fisheries Stock Analysis. R package version 0.9.3, https://github.com/fishR-Core-Team/FSA.
+
+```
+
+##NOTE: for the purposes of this code, "Survey 2" = marine aquaculture survey (MA survey) and "Survey 3" = seaweed farming survey (SW survey). The code is annotated throughout to explain transformations and groupings. Overall, in the chunk of code that follows, initial transformations resulted the following important groupings that are then used throughout the analysis.
+
+Region survey_2 regions (MA survey) were filtered down to only responses from the states that were also surveyed in survey_3 (SW survey).
+
+Education: Due to skewed samples, the 7-8 categories were collapsed into 1 = high school or less, 2 = undergraduate or vocational training, 3 = graduate work or degree.
+
+#Paper analyses
+```{r, Full datasets with initial transformations, include = FALSE}
+
+survey_2 <- read_csv("final_survey_2.csv")
+
+survey_3 <- read_csv("final_survey_3.csv")
+
+#adjust survey 2 regions to match survey 3 regions with a new categorical column labeled Region_s3. NOTE: Alaska collapsed into PNW category due to low sample size
+survey_2$Region_s3 = as.numeric(survey_2$survey_2_region)
+survey_2$Region_s3 <- case_when(
+  survey_2$Region_s3 %% 8 == 0 ~ "South",
+  survey_2$Region_s3 %% 7 == 0 ~ "West",
+  survey_2$Region_s3 %% 6 == 0 ~ "Midwest",
+  survey_2$Region_s3 %% 5 == 0 ~ "Mid Atlantic",
+  survey_2$Region_s3 %% 4 == 0 ~ "New England",
+  survey_2$Region_s3 %% 3 == 0 ~ "California",
+  survey_2$Region_s3 %% 2 == 0 ~ "Pacific Northwest",
+  survey_2$Region_s3 %% 1 == 0 ~ "Pacific Northwest")
+
+#Remove the regions from survey 2 that were not sampled in survey 3
+survey_2 <- survey_2 %>%
+ dplyr::filter(Region_s3 != "South")
+survey_2 <- survey_2 %>%
+  dplyr::filter(Region_s3 != "Mid Atlantic")
+survey_2 <- survey_2 %>%
+  dplyr::filter(Region_s3 != "Midwest")
+table(survey_2$Region_s3)
+survey_2 <- survey_2 %>%
+  dplyr::filter(Region_s3 != "West")# Final n = 154
+
+#preserve each opinion level for Wilcoxon test
+survey_2$Opinion_aqua_pre_all <- survey_2$Opinion_aqua_pre
+survey_2$Opinion_aqua_post_all <- survey_2$Opinion_aqua_post
+table(survey_2$Opinion_aqua_pre_all)
+#re-order likert scales to be more intuitive for rest of analyses.  
+#for full likert scale for pre-post analysis:
+#1 = very unfavorable, 2 = unfavorable, 3 = neutral, 4 = favorable, 5 = very favorable, 6 = not sure
+survey_2$Opinion_aqua_pre_all = as.numeric(survey_2$Opinion_aqua_pre_all)
+table(survey_2$Opinion_aqua_pre_all)
+survey_2$Opinion_aqua_pre_all <- case_when(
+  survey_2$Opinion_aqua_pre_all %% 6 == 0 ~ 6,
+  survey_2$Opinion_aqua_pre_all %% 5 == 0 ~ 1,
+  survey_2$Opinion_aqua_pre_all %% 4 == 0 ~ 2,
+  survey_2$Opinion_aqua_pre_all %% 3 == 0 ~ 3,
+  survey_2$Opinion_aqua_pre_all %% 2 == 0 ~ 4,
+  survey_2$Opinion_aqua_pre_all %% 1 == 0 ~ 5) 
+
+survey_2$Opinion_aqua_post_all = as.numeric(survey_2$Opinion_aqua_post_all)
+table(survey_2$Opinion_aqua_post_all)
+survey_2$Opinion_aqua_post_all <- case_when(
+  survey_2$Opinion_aqua_post_all %% 6 == 0 ~ 6,
+  survey_2$Opinion_aqua_post_all %% 5 == 0 ~ 1,
+  survey_2$Opinion_aqua_post_all %% 4 == 0 ~ 2,
+  survey_2$Opinion_aqua_post_all %% 3 == 0 ~ 3,
+  survey_2$Opinion_aqua_post_all %% 2 == 0 ~ 4,
+  survey_2$Opinion_aqua_post_all %% 1 == 0 ~ 5) 
+
+#for collapsed scores with m3 analysis:
+# 1 = unfavorable, 2 = neutral/not sure, 3 = favorable, 4 = not sure
+survey_2$Opinion_aqua_pre = as.numeric(survey_2$Opinion_aqua_pre)
+table(survey_2$Opinion_aqua_pre)
+survey_2$Opinion_aqua_pre <- case_when(
+  survey_2$Opinion_aqua_pre %% 6 == 0 ~ 4,
+  survey_2$Opinion_aqua_pre %% 5 == 0 ~ 1,
+  survey_2$Opinion_aqua_pre %% 4 == 0 ~ 1,
+  survey_2$Opinion_aqua_pre %% 3 == 0 ~ 2,
+  survey_2$Opinion_aqua_pre %% 2 == 0 ~ 3,
+  survey_2$Opinion_aqua_pre %% 1 == 0 ~ 3) 
+
+survey_2$Opinion_aqua_post = as.numeric(survey_2$Opinion_aqua_post)
+table(survey_2$Opinion_aqua_post)
+survey_2$Opinion_aqua_post <- case_when(
+  survey_2$Opinion_aqua_post %% 6 == 0 ~ 4,
+  survey_2$Opinion_aqua_post %% 5 == 0 ~ 1,
+  survey_2$Opinion_aqua_post %% 4 == 0 ~ 1,
+  survey_2$Opinion_aqua_post %% 3 == 0 ~ 2,
+  survey_2$Opinion_aqua_post %% 2 == 0 ~ 3,
+  survey_2$Opinion_aqua_post %% 1 == 0 ~ 3)
+
+#Transform education categories into three categories to avoid violating the assumptions of low expected values across groups with low representation.
+survey_2$Education = as.numeric(survey_2$Education)
+table(survey_2$Education)
+survey_2$Education_collapsed <- case_when(
+  survey_2$Education %% 9 == 0 ~ 3,
+  survey_2$Education %% 8 == 0 ~ 3,
+  survey_2$Education %% 7 == 0 ~ 3,
+  survey_2$Education %% 6 == 0 ~ 2,
+  survey_2$Education %% 5 == 0 ~ 2,
+  survey_2$Education %% 4 == 0 ~ 2,
+  survey_2$Education %% 3 == 0 ~ 1,
+  survey_2$Education %% 2 == 0 ~ 1,
+  survey_2$Education %% 1 == 0 ~ 1)
+table(survey_2$Education_collapsed)
+
+#Survey 3 same transformations but also remove Nation = Canada since we're only looking at responses from the United States
+survey_3 <- survey_3 %>%
+  dplyr::filter(Nation != 2)
+
+#preserve each opinion level for Wilcoxon test
+survey_3$Opinion_sw_pre_all <- survey_3$Opinion_seaweed
+survey_3$Opinion_sw_post_all <- survey_3$Opinion_seaweed_post
+table(survey_3$Opinion_sw_pre_all)
+
+#re-order likert scales to be more intuitive for rest of analyses.  
+#for full likert scale for pre-post analysis:
+#1 = very unfavorable, 2 = unfavorable, 3 = neutral, 4 = favorable, 5 = very favorable, 6 = not sure, 7 = never heard of it
+survey_3$Opinion_sw_pre_all = as.numeric(survey_3$Opinion_sw_pre_all)
+table(survey_3$Opinion_sw_pre_all)
+survey_3$Opinion_sw_pre_all <- case_when(
+  survey_3$Opinion_sw_pre_all %% 7 == 0 ~ 7,
+  survey_3$Opinion_sw_pre_all %% 6 == 0 ~ 6,
+  survey_3$Opinion_sw_pre_all %% 5 == 0 ~ 1,
+  survey_3$Opinion_sw_pre_all %% 4 == 0 ~ 2,
+  survey_3$Opinion_sw_pre_all %% 3 == 0 ~ 3,
+  survey_3$Opinion_sw_pre_all %% 2 == 0 ~ 4,
+  survey_3$Opinion_sw_pre_all %% 1 == 0 ~ 5) 
+
+survey_3$Opinion_sw_post_all = as.numeric(survey_3$Opinion_sw_post_all)
+table(survey_3$Opinion_sw_post_all)
+survey_3$Opinion_sw_post_all <- case_when(
+  survey_3$Opinion_sw_post_all %% 6 == 0 ~ 6,
+  survey_3$Opinion_sw_post_all %% 5 == 0 ~ 1,
+  survey_3$Opinion_sw_post_all %% 4 == 0 ~ 2,
+  survey_3$Opinion_sw_post_all %% 3 == 0 ~ 3,
+  survey_3$Opinion_sw_post_all %% 2 == 0 ~ 4,
+  survey_3$Opinion_sw_post_all %% 1 == 0 ~ 5) 
+
+survey_3$Opinion_aq_all = as.numeric(survey_3$Opinion_aquaculture)
+table(survey_3$Opinion_aq_all)
+survey_3$Opinion_aq_all <- case_when(
+  survey_3$Opinion_aq_all %% 7 == 0 ~ 7,
+  survey_3$Opinion_aq_all %% 6 == 0 ~ 6,
+  survey_3$Opinion_aq_all %% 5 == 0 ~ 1,
+  survey_3$Opinion_aq_all %% 4 == 0 ~ 2,
+  survey_3$Opinion_aq_all %% 3 == 0 ~ 3,
+  survey_3$Opinion_aq_all %% 2 == 0 ~ 4,
+  survey_3$Opinion_aq_all %% 1 == 0 ~ 5) 
+
+#collapsed categories for the message testing analysis
+#End categories are: 1 = unfavorable, 2 = neutral, 3 = favorable, 4 = don't know, 7 = never heard.
+survey_3$Opinion_seaweed = as.numeric(survey_3$Opinion_seaweed)
+table(survey_3$Opinion_seaweed)
+survey_3$Opinion_seaweed <- case_when(
+  survey_3$Opinion_seaweed %% 7 == 0 ~ 7,
+  survey_3$Opinion_seaweed %% 6 == 0 ~ 4,
+  survey_3$Opinion_seaweed %% 5 == 0 ~ 1,
+  survey_3$Opinion_seaweed %% 4 == 0 ~ 1,
+  survey_3$Opinion_seaweed %% 3 == 0 ~ 2,
+  survey_3$Opinion_seaweed %% 2 == 0 ~ 3,
+  survey_3$Opinion_seaweed %% 1 == 0 ~ 3)
+
+survey_3$Opinion_seaweed_post = as.numeric(survey_3$Opinion_seaweed_post)
+table(survey_3$Opinion_seaweed_post)
+survey_3$Opinion_seaweed_post <- case_when(
+  survey_3$Opinion_seaweed_post %% 6 == 0 ~ 4,
+  survey_3$Opinion_seaweed_post %% 5 == 0 ~ 1,
+  survey_3$Opinion_seaweed_post %% 4 == 0 ~ 1,
+  survey_3$Opinion_seaweed_post %% 3 == 0 ~ 2,
+  survey_3$Opinion_seaweed_post %% 2 == 0 ~ 3,
+  survey_3$Opinion_seaweed_post %% 1 == 0 ~ 3)
+
+survey_3$Opinion_aquaculture = as.numeric(survey_3$Opinion_aquaculture)
+table(survey_3$Opinion_aquaculture)
+survey_3$Opinion_aquaculture <- case_when(
+  survey_3$Opinion_aquaculture %% 7 == 0 ~ 7,
+  survey_3$Opinion_aquaculture %% 6 == 0 ~ 4,
+  survey_3$Opinion_aquaculture %% 5 == 0 ~ 1,
+  survey_3$Opinion_aquaculture %% 4 == 0 ~ 1,
+  survey_3$Opinion_aquaculture %% 3 == 0 ~ 2,
+  survey_3$Opinion_aquaculture %% 2 == 0 ~ 3,
+  survey_3$Opinion_aquaculture %% 1 == 0 ~ 3)
+
+#transform familiarity into a categorical variable in new column
+survey_3$Familiarity_aquaculture = as.numeric(survey_3$Familiarity_aquaculture)
+table(survey_3$Familiarity_aquaculture)
+survey_3$Familiarity_aq_factor <- case_when(
+  survey_3$Familiarity_aquaculture %% 4 == 0 ~ "Never heard of it",
+  survey_3$Familiarity_aquaculture %% 3 == 0 ~ "Heard of it but know little about it",
+  survey_3$Familiarity_aquaculture %% 2 == 0 ~ "Somewhat familiar",
+  survey_3$Familiarity_aquaculture %% 1 == 0 ~ "Very familiar")
+
+survey_3$Familiarity_seaweed = as.numeric(survey_3$Familiarity_seaweed)
+table(survey_3$Familiarity_seaweed)
+survey_3$Familiarity_sw_factor <- case_when(
+  survey_3$Familiarity_seaweed %% 4 == 0 ~ "Never heard of it",
+  survey_3$Familiarity_seaweed %% 3 == 0 ~ "Heard of it but know little about it",
+  survey_3$Familiarity_seaweed %% 2 == 0 ~ "Somewhat familiar",
+  survey_3$Familiarity_seaweed %% 1 == 0 ~ "Very familiar")
+table(survey_3$Familiarity_sw_factor)
+table(survey_3$Familiarity_aq_factor)
+
+#Also reorder familiarity as numeric categories to be 1 = never heard of it 4 = very familiar
+survey_3$Familiarity_aquaculture = as.numeric(survey_3$Familiarity_aquaculture)
+table(survey_3$Familiarity_aquaculture)
+survey_3$Familiarity_aquaculture <- case_when(
+  survey_3$Familiarity_aquaculture %% 4 == 0 ~ 1,
+  survey_3$Familiarity_aquaculture %% 3 == 0 ~ 2,
+  survey_3$Familiarity_aquaculture %% 2 == 0 ~ 3,
+  survey_3$Familiarity_aquaculture %% 1 == 0 ~ 4)
+
+survey_3$Familiarity_seaweed = as.numeric(survey_3$Familiarity_seaweed)
+table(survey_3$Familiarity_seaweed)
+survey_3$Familiarity_seaweed <- case_when(
+  survey_3$Familiarity_seaweed %% 4 == 0 ~ 1,
+  survey_3$Familiarity_seaweed %% 3 == 0 ~ 2,
+  survey_3$Familiarity_seaweed %% 2 == 0 ~ 3,
+  survey_3$Familiarity_seaweed %% 1 == 0 ~ 4)
+table(survey_3$Familiarity_sw_factor)
+
+#Transform education categories into three categories to avoid violating the assumptions of low expected values across groups with low representation.
+survey_3$Education = as.numeric(survey_3$Education)
+table(survey_3$Education)
+survey_3$Education_collapsed <- case_when(
+  survey_3$Education %% 8 == 0 ~ 3,
+  survey_3$Education %% 7 == 0 ~ 3,
+  survey_3$Education %% 6 == 0 ~ 3,
+  survey_3$Education %% 5 == 0 ~ 2,
+  survey_3$Education %% 4 == 0 ~ 2,
+  survey_3$Education %% 3 == 0 ~ 2,
+  survey_3$Education %% 2 == 0 ~ 1,
+  survey_3$Education %% 1 == 0 ~ 1, 
+  survey_3$Education %% 0 == 0 ~ 1)
+table(survey_3$Education_collapsed)
+
+survey_3$Opinion_seaweed_post_factor <- case_when(
+  survey_3$Opinion_seaweed_post %% 4 == 0 ~ "Not sure",
+  survey_3$Opinion_seaweed_post %% 3 == 0 ~ "Favorable",
+  survey_3$Opinion_seaweed_post %% 2 == 0 ~ "Neutral",
+  survey_3$Opinion_seaweed_post %% 1 == 0 ~ "Unfavorablt")
+
+table(survey_3$Opinion_seaweed, survey_3$Opinion_seaweed_post_factor)
+table(survey_3$Opinion_seaweed_post)
+
+table(survey_3$Opinion_aquaculture,survey_3$Familiarity_aq_factor)
+
+table(survey_3$Opinion_seaweed,survey_3$Familiarity_sw_factor)
+
+```
+
+##Baseline opinions by familiarity level (SW survey only)
+###Ommitting "not sure" and "never heard of it" groups for analysis seperately.
+```{r, Ordinal regressions and Kruskal-Wallace tests on baseline opinions (SW survey only), echo = FALSE}
+
+####Seaweed farming####
+ 
+#pull necessary columns. 
+sw_ols_all <- survey_3 %>%
+  select(Opinion_seaweed, Familiarity_sw_factor, Education_collapsed, Age_factor, Region_factor, Race_factor)
+
+ma_ols_all <- survey_3 %>%
+  select(Opinion_aquaculture, Familiarity_aq_factor, Education_collapsed, Age_factor, Region_factor, Race_factor)
+
+#remove incomplete responses 
+sw_ols_all <- na.omit(sw_ols_all)
+ma_ols_all <- na.omit(ma_ols_all)
+
+
+table(ma_ols_all$Familiarity_aq_factor, ma_ols_all$Opinion_aquaculture)
+
+table(ma_ols_all$Familiarity_aq_factor, ma_ols_all$Opinion_aquaculture)
+
+
+#Pull 'Never heard of it' and "not sure" from dataset (analyzed seperately) to be able to analyze baseline opinion by baseline familiarity and sociodemographics with an ordered regression. 
+
+#for all data
+sw_ols_clean <- sw_ols_all %>%
+  dplyr::filter(Opinion_seaweed != "7") 
+sw_ols_clean <- sw_ols_clean %>%
+  dplyr::filter(Opinion_seaweed != "4") #final n is 484
+
+ma_ols_clean <- ma_ols_all %>%
+  dplyr::filter(Opinion_aquaculture != "7")
+ma_ols_clean <- ma_ols_clean %>%
+  dplyr::filter(Opinion_aquaculture != "4") #final n is 565
+
+#double check that there are no lingering "never heard of it" responses in the familiarity column.
+table(sw_ols_clean$Opinion_seaweed)
+table(ma_ols_clean$Opinion_aquaculture)
+table(sw_ols_clean$Familiarity_sw_factor)
+table(ma_ols_clean$Familiarity_aq_factor)
+
+#Baseline opinion of seaweed farming by familiarity level
+sw_ols_clean$Opinion_seaweed = factor(sw_ols_clean$Opinion_seaweed,
+                                          ordered = TRUE,
+                                          levels = c("1", "2", "3"))
+sw_ols_clean$Familiarity_sw_factor = as.factor(sw_ols_clean$Familiarity_sw_factor)
+str(sw_ols_clean)
+sw_ols_clean$Education_collapsed = as.factor(sw_ols_clean$Education_collapsed)
+sw_ols_clean$Age_factor = as.factor(sw_ols_clean$Age_factor)
+sw_ols_clean$Region_factor = as.factor(sw_ols_clean$Region_factor)
+sw_ols_clean$Race_factor = as.factor(sw_ols_clean$Race_factor)
+
+sw_ols_clean$Familiarity_sw_factor <- fct_relevel(sw_ols_clean$Familiarity_sw_factor, c("Very familiar", "Somewhat familiar", "Heard of it but know little about it"))
+
+#Ordered logistic regressions on each variable 
+ols1_sw_polr = polr(Opinion_seaweed ~ Familiarity_sw_factor, data = sw_ols_clean, Hess = TRUE)
+summary(ols1_sw_polr)
+#Test Assumptions
+brant(ols1_sw_polr)  #parallel regression assumption holds
+Anova(ols1_sw_polr) #significant difference across familiarity groups.
+#Odds ratios for familiarity
+ci_sw <- confint(ols1_sw_polr)
+exp(cbind(OR = coef(ols1_sw_polr), ci_sw))
+
+#p-values
+ctable_sw <- coef(summary(ols1_sw_polr))
+p <- pnorm(abs(ctable_sw[, "t value"]), lower.tail = FALSE) * 2
+ctable <- cbind(ctable_sw, "p value" = p)
+
+#contrasts
+emmeans(ols1_sw_polr, list(pairwise ~ Familiarity_sw_factor))
+em_sw_familiarity <- emmeans(ols1_sw_polr, ~Familiarity_sw_factor, type = "response") 
+pairs_sw_familiarity <-pairs(em_sw_familiarity, adjust = "fdr") #use this method for p-value adjustment
+#predicted probabilities
+familiarity_sw_clm = clm(Opinion_seaweed ~ Familiarity_sw_factor, data = sw_ols_clean, Hess = TRUE)
+sw_predictions = ggpredict(familiarity_sw_clm, terms = c("Familiarity_sw_factor"))
+
+#test with education
+familiarity_sw_polr = polr(Opinion_seaweed ~ Familiarity_sw_factor + Education_collapsed, data = sw_ols_clean, Hess = TRUE)
+summary(familiarity_sw_polr)
+#Test Assumptions
+brant(familiarity_sw_polr)  #parallel regression assumption does not hold for education levels but does hold for familiarity. The AIC isn't any better with multivariate or univariate.
+Anova(familiarity_sw_polr) #significant difference for familiarity not education. See Kruskal-Wallis tests below for confirmation.
+
+####Sociodemographic variables####
+age_sw_polr = polr(Opinion_seaweed ~ Age_factor, data = sw_ols_clean, Hess = TRUE)
+summary(age_sw_polr)
+#Test Assumptions
+brant(age_sw_polr)  #parallel regression assumption does not hold for age. See Kruskal-Wallis tests below for confirmation.
+Anova(age_sw_polr) #no significant difference
+
+region_sw_polr = polr(Opinion_seaweed ~ Region_factor, data = sw_ols_clean, Hess = TRUE)
+summary(region_sw_polr)
+#Test Assumptions
+brant(region_sw_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(region_sw_polr) #no significant difference
+
+race_sw_polr = polr(Opinion_seaweed ~ Race_factor, data = sw_ols_clean, Hess = TRUE)
+summary(race_sw_polr)
+#Test Assumptions
+brant(race_sw_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(race_sw_polr) #no significant difference
+
+####Marine Aquaculture####
+ma_ols_clean$Opinion_aquaculture = factor(ma_ols_clean$Opinion_aquaculture,
+                                          ordered = TRUE,
+                                          levels = c("1", "2", "3"))
+ma_ols_clean$Familiarity_aq_factor = as.factor(ma_ols_clean$Familiarity_aq_factor)
+ma_ols_clean$Familiarity_aq_factor <- fct_relevel(ma_ols_clean$Familiarity_aq_factor, c("Very familiar", "Somewhat familiar", "Heard of it but know little about it"))
+str(ma_ols_clean)
+ma_ols_clean$Education_collapsed = as.factor(ma_ols_clean$Education_collapsed)
+ma_ols_clean$Age_factor = as.factor(ma_ols_clean$Age_factor)
+ma_ols_clean$Region_factor = as.factor(ma_ols_clean$Region_factor)
+ma_ols_clean$Race_factor = as.factor(ma_ols_clean$Race_factor)
+
+familiarity_ma_polr = polr(Opinion_aquaculture ~ Familiarity_aq_factor, data = ma_ols_clean, Hess = TRUE)
+summary(familiarity_ma_polr)
+#Test Assumptions
+brant(familiarity_ma_polr)  #parallel regression assumption holds
+Anova(familiarity_ma_polr) #significant difference
+
+#Odds ratios for familiarity
+ci_ma1 <- confint(familiarity_ma_polr)
+exp(cbind(OR = coef(familiarity_ma_polr), ci_ma1))
+
+#p-values
+ctable_ma <- coef(summary(familiarity_ma_polr))
+p <- pnorm(abs(ctable_ma[, "t value"]), lower.tail = FALSE) * 2
+ctable_ma <- cbind(ctable_ma, "p value" = p)
+
+#contrasts
+em_aq <- emmeans(familiarity_ma_polr, ~Familiarity_aq_factor, type = "response") 
+pairs_aq <-pairs(em_aq, adjust = "fdr")
+
+#predicted probabilities
+familiarity_ma_clm = clm(Opinion_aquaculture ~ Familiarity_aq_factor, data = ma_ols_clean, Hess = TRUE)
+ma_predictions = ggpredict(familiarity_ma_clm, terms = c("Familiarity_aq_factor"))
+
+####Sociodemographic variables####
+education_ma_polr = polr(Opinion_aquaculture ~ Education_collapsed, data = ma_ols_clean, Hess = TRUE)
+summary(education_ma_polr)
+#Test Assumptions
+brant(education_ma_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(education_ma_polr) #significant difference for education
+
+age_ma_polr = polr(Opinion_aquaculture ~ Age_factor, data = ma_ols_clean, Hess = TRUE)
+summary(age_ma_polr)
+#Test Assumptions
+brant(age_ma_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(age_ma_polr) #significant difference
+
+region_ma_polr = polr(Opinion_aquaculture ~ Region_factor, data = ma_ols_clean, Hess = TRUE)
+summary(region_ma_polr)
+#Test Assumptions
+brant(region_ma_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(region_ma_polr) #no significant difference
+
+race_ma_polr = polr(Opinion_aquaculture ~ Race_factor, data = ma_ols_clean, Hess = TRUE)
+summary(race_ma_polr)
+#Test Assumptions
+brant(race_ma_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(race_ma_polr) #no significant difference
+
+####Kruskal-Wallis Tests####
+#Kruskal-Wallis rank sum tests on variables that did not meet the parallel regression assumption
+aqua_ed_kw <- kruskal.test(Opinion_aquaculture ~ Education_collapsed, data = ma_ols_clean)
+
+aqua_age_kw <- kruskal.test(Opinion_aquaculture ~ Age_factor, data = ma_ols_clean)
+
+aqua_region_kw <- kruskal.test(Opinion_aquaculture ~ Region_factor, data = ma_ols_clean)
+
+aqua_race_kw <- kruskal.test(Opinion_aquaculture ~ Race_factor, data = ma_ols_clean)
+
+sw_ed_kw <- kruskal.test(Opinion_seaweed ~ Education_collapsed, data = sw_ols_clean)
+
+sw_age_kw <- kruskal.test(Opinion_seaweed ~ Age_factor, data = sw_ols_clean)
+
+sw_region_kw <- kruskal.test(Opinion_seaweed ~ Region_factor, data = sw_ols_clean)
+
+sw_race_kw <- kruskal.test(Opinion_seaweed ~ Race_factor, data = sw_ols_clean)
+
+#K-W contrasts on significant variables using Dunn's test as a post-hoc test and the Bejamini-Hochberg FDR method for multiple hypothesis testing at a 5% cutoff.
+
+library(FSA)
+ma_ols_clean$Opinion_aquaculture = as.numeric(ma_ols_clean$Opinion_aquaculture)
+sw_ols_clean$Opinion_seaweed = as.numeric(sw_ols_clean$Opinion_seaweed)
+
+aqua_ed_contrasts <- dunnTest( Opinion_aquaculture ~ Education_collapsed, data = ma_ols_clean, method = "bh")
+
+aqua_age_contrasts <- dunnTest(Opinion_aquaculture ~ Age_factor, data = ma_ols_clean, method = "bh")
+
+sw_ed_contrasts <- dunnTest( Opinion_seaweed ~ Education_collapsed, data = sw_ols_clean, method = "bh")
+
+sw_age_contrasts <- dunnTest( Opinion_seaweed ~ Age_factor, data = sw_ols_clean, method = "bh")
+
+#visualize it
+data <- as.data.frame(table(ma_ols_clean$Opinion_aquaculture, ma_ols_clean$Education_collapsed))
+ggplot(data, aes(x = Var2, y = Freq, fill = Var1))+
+  geom_col()
+data_2 <- as.data.frame(table(ma_ols_clean$Opinion_aquaculture, ma_ols_clean$Age_factor))
+ggplot(data_2, aes(x = Var2, y = Freq, fill = Var1))+
+  geom_col()
+data_3 <- as.data.frame(table(sw_ols_clean$Opinion_seaweed, sw_ols_clean$Education_collapsed))
+ggplot(data_3, aes(x = Var2, y = Freq, fill = Var1))+
+  geom_col()
+
+####MA survey results####
+ma_s2_kw <- survey_2 %>%
+  select(Opinion_aqua_pre, Education_collapsed, Age, Region_factor, Race_factor)
+
+ma_s2_kw <- mutate_all(ma_s2_kw, na_if, '#NULL!')
+ma_s2_kw <- ma_s2_kw[complete.cases(ma_s2_kw),] #(n = 2, brings it down to 152)
+
+#Pull "not sure" from dataset (analyzed seperately)
+table(ma_s2_kw$Opinion_aqua_pre)
+ma_s2_kw <- ma_s2_kw %>%
+  dplyr::filter(Opinion_aqua_pre != "4") #final n is 138
+
+#Baseline opinion of aquaculture is ordered
+ma_s2_kw$Opinion_aqua_pre = factor(ma_s2_kw$Opinion_aqua_pre,
+                                          ordered = TRUE,
+                                          levels = c("1", "2", "3"))
+
+ma_s2_kw$Education_collapsed = as.factor(ma_s2_kw$Education_collapsed)
+ma_s2_kw$Age = as.factor(ma_s2_kw$Age)
+ma_s2_kw$Region_factor = as.factor(ma_s2_kw$Region_factor)
+ma_s2_kw$Race_factor = as.factor(ma_s2_kw$Race_factor)
+
+####Kruskal-Wallis Tests####
+#Kruskal-Wallis rank sum tests on variables that did not meet the parallel regression assumption
+s2_ed_kw <- kruskal.test(Opinion_aqua_pre ~ Education_collapsed, data = ma_s2_kw) #slightly significant
+
+s2_age_kw <- kruskal.test(Opinion_aqua_pre ~ Age, data = ma_s2_kw) #not significant
+
+s2_region_kw <- kruskal.test(Opinion_aqua_pre ~ Region_factor, data = ma_s2_kw) #not significant
+
+s2_race_kw <- kruskal.test(Opinion_aqua_pre ~ Race_factor, data = ma_s2_kw)#not significant
+
+#K-W contrasts on significant variables using Dunn's test as a post-hoc test and the Bejamini-Hochberg FDR method for multiple hypothesis testing at a 5% cutoff.
+
+library(FSA)
+ma_s2_kw$Opinion_aqua_pre = as.numeric(ma_s2_kw$Opinion_aqua_pre)
+
+s2_ed_contrasts <- dunnTest( Opinion_aqua_pre ~ Education_collapsed, data = ma_s2_kw, method = "bh") #similar to other trend
+
+```
+
+```{r, Kruskal-Wallace tests on baseline familiarity with sociodemographics as predictors (SW survey only), echo = FALSE}
+
+####Seaweed farming###
+
+#pull necessary columns. 
+table(survey_3$Familiarity_sw_factor)
+table(survey_3$Familiarity_aquaculture)
+sw_familiarity <- survey_3 %>%
+  select(Familiarity_sw_factor, Education_collapsed, Age_factor, Region_factor, Race_factor, Familiarity_seaweed)
+
+ma_familiarity <- survey_3 %>%
+  select(Familiarity_aq_factor, Education_collapsed, Age_factor, Region_factor, Race_factor, Familiarity_aquaculture)
+
+#remove incomplete responses 
+sw_familiarity <- mutate_all(sw_familiarity, na_if, '#NULL!')
+sw_familiarity <- sw_familiarity[complete.cases(sw_familiarity),] #(n = 4)
+
+ma_familiarity <- mutate_all(ma_familiarity, na_if, '#NULL!')
+ma_familiarity <- ma_familiarity[complete.cases(ma_familiarity),] #(n = 0)
+
+#Remove never heard of it since analysed elsewhere
+sw_familiarity <- sw_familiarity %>%
+  dplyr::filter(Familiarity_seaweed != 1)
+table(sw_familiarity$Familiarity_seaweed)
+
+ma_familiarity <- ma_familiarity %>%
+  dplyr::filter(Familiarity_aquaculture != 1)
+table(ma_familiarity$Familiarity_aquaculture)
+
+#Baseline familiarity by sociodemographic variables
+
+sw_familiarity$Familiarity_sw_factor = as.factor(sw_familiarity$Familiarity_sw_factor)
+sw_familiarity$Education_collapsed = as.factor(sw_familiarity$Education_collapsed)
+sw_familiarity$Age_factor = as.factor(sw_familiarity$Age_factor)
+sw_familiarity$Region_factor = as.factor(sw_familiarity$Region_factor)
+sw_familiarity$Race_factor = as.factor(sw_familiarity$Race_factor)
+sw_familiarity$Familiarity_seaweed = as.numeric(sw_familiarity$Familiarity_seaweed)
+
+ma_familiarity$Familiarity_aq_factor = as.factor(ma_familiarity$Familiarity_aq_factor)
+ma_familiarity$Education_collapsed = as.factor(ma_familiarity$Education_collapsed)
+ma_familiarity$Age_factor = as.factor(ma_familiarity$Age_factor)
+ma_familiarity$Region_factor = as.factor(ma_familiarity$Region_factor)
+ma_familiarity$Race_factor = as.factor(ma_familiarity$Race_factor)
+ma_familiarity$Familiarity_aquaculture = as.numeric(ma_familiarity$Familiarity_aquaculture)
+
+####Kruskal-Wallis Tests####
+
+aq_ed_familiarity <- kruskal.test(Familiarity_aq_factor ~ Education_collapsed, data = ma_familiarity) #significant
+
+aqua_age_familiarity <- kruskal.test(Familiarity_aq_factor ~ Age_factor, data = ma_familiarity)#significant
+
+aqua_region_familiarity <- kruskal.test(Familiarity_aq_factor ~ Region_factor, data = ma_familiarity) #not significant
+
+aqua_race_familiarity <- kruskal.test(Familiarity_aq_factor ~ Race_factor, data = ma_familiarity)#not significant
+
+sw_ed_familiarity <- kruskal.test(Familiarity_sw_factor ~ Education_collapsed, data = sw_familiarity) #significant
+
+sw_age_familiarity <- kruskal.test(Familiarity_sw_factor ~ Age_factor, data = sw_familiarity) #significant
+
+sw_race_familiarity <- kruskal.test(Familiarity_sw_factor ~ Race_factor, data = sw_familiarity) #not significant
+
+sw_region_familiarity <- kruskal.test(Familiarity_sw_factor ~ Region_factor, data = sw_familiarity) #not significant
+
+#K-W contrasts on significant variables using Dunn's test as a post-hoc test and the Bejamini-Hochberg FDR method for multiple hypothesis testing at a 5% cutoff.
+ma_familiarity$Familiarity_aq_factor = as.numeric(ma_familiarity$Familiarity_aq_factor)
+ma_familiarity$Education_collapsed = as.factor(ma_familiarity$Education_collapsed)
+sw_familiarity$Familiarity_sw_factor = as.numeric(sw_familiarity$Familiarity_sw_factor)
+sw_familiarity$Education_collapsed = as.factor(sw_familiarity$Education_collapsed)
+sw_familiarity$Age_factor = as.factor(sw_familiarity$Age_factor)
+
+ma_ed_fam_contrasts <- dunnTest(Familiarity_aquaculture ~ Education_collapsed, data = ma_familiarity, method = "bh")
+
+ma_age_fam_contrasts <- dunnTest(Familiarity_aquaculture ~ Age_factor, data = ma_familiarity, method = "bh")
+
+sw_ed_fam_contrasts <- dunnTest(Familiarity_seaweed ~ Education_collapsed, data = sw_familiarity, method = "bh")
+
+sw_age_fam_contrasts <- dunnTest(Familiarity_seaweed ~ Age_factor, data = sw_familiarity, method = "bh")
+table(sw_familiarity$Familiarity_sw_factor)
+
+#visualize it for helping to report
+data_ma_ed <- as.data.frame(table(ma_familiarity$Familiarity_aquaculture, ma_familiarity$Education_collapsed))
+#var1 is familiarity var2 is education
+ggplot(data_ma_ed, aes(x = Var1, y = Freq, fill = Var2))+
+  geom_col()
+
+data_ma_age <- as.data.frame(table(ma_familiarity$Familiarity_aq_factor, ma_familiarity$Age_factor))
+ggplot(data_ma_age, aes(x = Var2, y = Freq, fill = Var1))+
+  geom_col()
+
+```
+
+##Sociodemographic attributes of "not sure" and "never heard" groups.
+```{r, Kruskal-Wallace tests with sociodemographics predictors (SW survey only), echo = FALSE}
+
+####Seaweed farming####
+ 
+#pull necessary columns. 
+sw_group_all <- survey_3 %>%
+  select(Opinion_seaweed, Familiarity_sw_factor, Education_collapsed, Age_factor, Region_factor, Race_factor)
+
+ma_group_all <- survey_3 %>%
+  select(Opinion_aquaculture, Familiarity_aq_factor, Education_collapsed, Age_factor, Region_factor, Race_factor)
+
+#remove incomplete responses 
+sw_group_all <- mutate_all(sw_group_all, na_if, '#NULL!')
+sw_group_all <- sw_group_all[complete.cases(sw_group_all),] #(n = 4)
+
+ma_group_all <- mutate_all(ma_group_all, na_if, '#NULL!')
+ma_group_all <- ma_group_all[complete.cases(ma_group_all),] #(n = 0)
+
+#Create three categories with dummy variables: 1 = never heard group, 2 = not sure group, 3 = all others 
+
+sw_group_all$Opinion_seaweed = as.numeric(sw_group_all$Opinion_seaweed)
+table(sw_group_all$Opinion_seaweed)
+sw_group_all$Opinion_seaweed <- case_when(
+  sw_group_all$Opinion_seaweed %% 7 == 0 ~ 1,
+  sw_group_all$Opinion_seaweed %% 4 == 0 ~ 2,
+  sw_group_all$Opinion_seaweed %% 3 == 0 ~ 3,
+  sw_group_all$Opinion_seaweed %% 2 == 0 ~ 3,
+  sw_group_all$Opinion_seaweed %% 1 == 0 ~ 3) #total n = 861
+
+ma_group_all$Opinion_aquaculture = as.numeric(ma_group_all$Opinion_aquaculture)
+table(ma_group_all$Opinion_aquaculture)
+ma_group_all$Opinion_aquaculture <- case_when(
+  ma_group_all$Opinion_aquaculture %% 7 == 0 ~ 1,
+  ma_group_all$Opinion_aquaculture %% 4 == 0 ~ 2,
+  ma_group_all$Opinion_aquaculture %% 3 == 0 ~ 3,
+  ma_group_all$Opinion_aquaculture %% 2 == 0 ~ 3,
+  ma_group_all$Opinion_aquaculture %% 1 == 0 ~ 3)
+
+####Kruskal-Wallis####
+#Kruskal-Wallis rank sum tests on variables that did not meet the parallel regression assumption
+aqua_ed_groups <- kruskal.test(Opinion_aquaculture ~ Education_collapsed, data = ma_group_all) #significant
+
+aqua_age_groups <- kruskal.test(Opinion_aquaculture ~ Age_factor, data = ma_group_all) #not significant
+
+aqua_region_groups <- kruskal.test(Opinion_aquaculture ~ Region_factor, data = ma_group_all) #not significant
+
+aqua_race_groups <- kruskal.test(Opinion_aquaculture ~ Race_factor, data = ma_group_all) #not significant
+
+sw_ed_groups<- kruskal.test(Opinion_seaweed ~ Education_collapsed, data = sw_group_all) #significant
+
+sw_age_groups <- kruskal.test(Opinion_seaweed ~ Age_factor, data = sw_group_all)
+#not significant
+
+sw_region_groups <- kruskal.test(Opinion_seaweed ~ Region_factor, data = sw_group_all)
+#not significant
+
+sw_race_groups <- kruskal.test(Opinion_seaweed ~ Race_factor, data = sw_group_all)
+#not significant 
+
+#K-W contrasts on significant variables using Dunn's test as a post-hoc test and the Bejamini-Hochberg FDR method for multiple hypothesis testing at a 5% cutoff.
+
+ma_group_all$Opinion_aquaculture = as.numeric(ma_group_all$Opinion_aquaculture)
+ma_group_all$Education_collapsed = as.factor(ma_group_all$Education_collapsed)
+sw_group_all$Opinion_seaweed = as.numeric(sw_group_all$Opinion_seaweed)
+sw_group_all$Education_collapsed = as.factor(sw_group_all$Education_collapsed)
+sw_group_all$Age_factor = as.factor(sw_group_all$Age_factor)
+
+aqua_ed_group_contrasts <- dunnTest(Opinion_aquaculture ~ Education_collapsed, data = ma_group_all, method = "bh") #seems to be the same trend as above
+table(ma_group_all$Opinion_aquaculture, ma_group_all$Education_collapsed)
+
+sw_ed_group_contrasts <- dunnTest(Opinion_seaweed ~ Education_collapsed, data = sw_group_all, method = "bh") #same trend as above
+
+ma_age_group_contrasts <- dunnTest(Opinion_aquaculture ~ Age_factor, data = ma_group_all, method = "bh") #weak association 40 to 49 - 70+
+table(sw_group_all$Opinion_seaweed, sw_group_all$Age_factor)
+
+
+#visualize it
+#change edu levels to not be confused with opinion levels
+#4 = high school degree or less, 5 = some college, vocational training, or bachelor's degree, 3 = graduate work of any kind.
+ma_group_all$Education_collapsed2 = as.numeric(ma_group_all$Education_collapsed)
+ma_group_all$Education_collapsed2 <- case_when(
+  ma_group_all$Education_collapsed2 %% 3 == 0 ~ 6,
+  ma_group_all$Education_collapsed2 %% 2 == 0 ~ 5,
+  ma_group_all$Education_collapsed2 %% 1 == 0 ~ 4)
+
+data <- as.data.frame(table(ma_group_all$Opinion_aquaculture, ma_group_all$Education_collapsed2))
+#var1 is education var2 is opinion
+ggplot(data, aes(x = Var2, y = Freq, fill = Var1))+
+  geom_col()
+
+table(survey_3$Familiarity_aq_factor)
+table(survey_3$Familiarity_sw_factor)
+
+```
+
+##Changes in opinion pre- and post- video (SW survey and MA survey)
+```{r, Data for Wilcoxon tests on pre-post opinion, include = FALSE}
+
+s2_wilcox <- survey_2 %>%
+  dplyr::select(Opinion_aqua_pre_all, Opinion_aqua_post_all, VIDEOQUOTA)
+
+#remove incomplete responses (we need fully paired data, n = 1)
+s2_wilcox_clean <- s2_wilcox[complete.cases(s2_wilcox),]
+table(s2_wilcox_clean$Opinion_aqua_post_all)
+table(s2_wilcox_clean$Opinion_aqua_pre_all)
+#remove the "not sure" opinion groupins to analyze them seperately
+s2_wilcox_clean <- s2_wilcox_clean %>%
+  dplyr::filter(Opinion_aqua_pre_all != 6) #n = 15
+s2_wilcox_clean <- s2_wilcox_clean %>%
+  dplyr::filter(Opinion_aqua_post_all != 6) #n = 1 that was not sure pre, and 1 that was not.
+
+table(s2_wilcox_clean$VIDEOQUOTA)
+#final n for our subsampled data = 137; video1 = 31, video2 = 26, video3 = 14, video4 = 22, video5 = 21, video6 = 23
+
+#For this test we will look at all levels of opinion. 1 = very unfavorable, 2 = unfavorable, 3 = not sure, 4 = neutral, 5 = favorable, and 6 = very favorable.
+s2_wilcox_clean$Opinion_aqua_pre_all = as.numeric(s2_wilcox_clean$Opinion_aqua_pre_all)
+
+#name videos for initial inspections. This factor level was dropped in final analysis due to small sample size. Wilcoxon tests on the small sample size data found all videos had a significant positive effect (see bottom of this document for the code)
+s2_wilcox_clean$VIDEOQUOTA = as.numeric(s2_wilcox_clean$VIDEOQUOTA)
+s2_wilcox_clean$video_factor <- 
+  case_when(
+    s2_wilcox_clean$VIDEOQUOTA %% 6 == 0 ~ "Kanpachi Food Only",
+    s2_wilcox_clean$VIDEOQUOTA %% 5 == 0 ~ "Kanpachi No Food",
+    s2_wilcox_clean$VIDEOQUOTA %% 4 == 0 ~ "Standard Closing",
+    s2_wilcox_clean$VIDEOQUOTA %% 3 == 0 ~ "Standard Intro",
+    s2_wilcox_clean$VIDEOQUOTA %% 2 == 0 ~ "Mussels Food Only",
+    s2_wilcox_clean$VIDEOQUOTA %% 1 == 0 ~ "Mussels No Food")
+table(s2_wilcox_clean$video_factor)
+
+s2_wilcox_pre <- s2_wilcox_clean %>%
+  dplyr::select(video_factor, Opinion_aqua_pre_all)
+
+s2_wilcox_post <- s2_wilcox_clean %>%
+  dplyr::select(video_factor, Opinion_aqua_post_all)
+
+#rename the columns and add a column for pre or post
+s2_wilcox_pre$Opinion <- s2_wilcox_pre$Opinion_aqua_pre_all
+s2_wilcox_pre$pre_or_post = "Pre"
+s2_wilcox_pre <- s2_wilcox_pre %>%
+  dplyr::select(-Opinion_aqua_pre_all)
+
+s2_wilcox_post$Opinion <- s2_wilcox_post$Opinion_aqua_post_all
+s2_wilcox_post$pre_or_post = "Post"
+s2_wilcox_post <- s2_wilcox_post %>%
+  dplyr::select(-Opinion_aqua_post_all)
+
+#combine for long-form data
+s2_wilcox_data <- rbind(s2_wilcox_pre, s2_wilcox_post)
+
+#Data for seaweed video (survey 3)
+s3_wilcox <- survey_3 %>%
+  dplyr::select(Opinion_sw_pre_all, Opinion_sw_post_all, Familiarity_seaweed)
+
+#remove those that had never heard of seaweed farming
+s3_wilcox_clean <- s3_wilcox %>%
+  dplyr::filter(Opinion_sw_pre_all != 7)
+
+table(s3_wilcox_clean$Opinion_sw_pre_all)
+
+#remove incomplete responses (we need fully paired data) n = 3
+s3_wilcox_clean <- s3_wilcox_clean[complete.cases(s3_wilcox_clean),]
+
+#remove those that indicated "not sure" to analyze them seperately 
+s3_wilcox_clean <- s3_wilcox_clean %>%
+  dplyr::filter(Opinion_sw_pre_all != 6) #n = 54
+
+s3_wilcox_clean <- s3_wilcox_clean %>%
+  dplyr::filter(Opinion_sw_post_all != 6) #n = 3
+#final n = 587
+
+s3_wilcox_pre <- s3_wilcox_clean %>%
+  dplyr::select(Opinion_sw_pre_all, Familiarity_seaweed)
+
+s3_wilcox_post <- s3_wilcox_clean %>%
+  dplyr::select(Opinion_sw_post_all, Familiarity_seaweed)
+
+s3_wilcox_pre$Opinion <- s3_wilcox_pre$Opinion_sw_pre_all
+s3_wilcox_pre$pre_or_post = "Pre"
+s3_wilcox_pre <- s3_wilcox_pre %>%
+  dplyr::select(-Opinion_sw_pre_all)
+
+s3_wilcox_post$Opinion <- s3_wilcox_post$Opinion_sw_post_all
+s3_wilcox_post$pre_or_post = "Post"
+s3_wilcox_post <- s3_wilcox_post %>%
+  dplyr::select(-Opinion_sw_post_all)
+
+#bind dataframes
+s3_wilcox_data <- rbind(s3_wilcox_pre, s3_wilcox_post)
+
+```
+
+```{r, Wilcoxon signed rank tests on opinion pre- and post video, include = FALSE}
+####Wilcoxon sign Rank Test - on on each group's pre-post on paired data
+table(s2_wilcox_data$Opinion)
+str(s2_wilcox_data)
+s2_wilcox_data$Opinion = as.numeric(s2_wilcox_data$Opinion)
+s2_wilcox_data$pre_or_post = as.factor(s2_wilcox_data$pre_or_post)
+
+#test for MA survey videos
+test_ma <- s2_wilcox_data %>%
+  wilcox_test(Opinion ~ pre_or_post, paired = TRUE)
+eff_ma <- s2_wilcox_data %>%
+wilcox_effsize(Opinion ~ pre_or_post, paired = TRUE)
+sum_ma <- s2_wilcox_data %>%
+  group_by(pre_or_post) %>%
+  summarise(avg = sum(Opinion/length(Opinion)))
+
+#Overall test for seaweed farming (survey 3)
+s3_wilcox_data$Opinion = as.numeric(s3_wilcox_data$Opinion)
+test_sw <- s3_wilcox_data %>%
+  wilcox_test(Opinion ~ pre_or_post, paired = TRUE)
+eff_sw <- s3_wilcox_data %>%
+wilcox_effsize(Opinion ~ pre_or_post, paired = TRUE)
+sum_sw <- s3_wilcox_data %>%
+  group_by(pre_or_post) %>%
+  summarise(avg = sum(Opinion/length(Opinion)))
+
+#Test for different familiarity levels
+table(s3_wilcox_data$Familiarity_seaweed)
+very_familiar <- s3_wilcox_data %>%
+  dplyr::filter(Familiarity_seaweed == 4) #n = 97
+
+somewhat_familiar <-s3_wilcox_data %>%
+  dplyr::filter(Familiarity_seaweed == 3) #n = 214
+  
+know_little <-s3_wilcox_data %>%
+  dplyr::filter(Familiarity_seaweed == 2) #n = 276
+
+#Wilxocon tests on each level of familiarity
+test_very_familiar <- very_familiar %>%
+  wilcox_test(Opinion ~ pre_or_post, paired = TRUE)
+eff_very_familiar <- very_familiar %>%
+  wilcox_effsize(Opinion ~ pre_or_post, paired = TRUE)
+
+test_somewhat_familiar <- somewhat_familiar %>%
+  wilcox_test(Opinion ~ pre_or_post, paired = TRUE)
+eff_very_familiar <- somewhat_familiar %>%
+  wilcox_effsize(Opinion ~ pre_or_post, paired = TRUE)
+
+test_know_little <- know_little %>%
+  wilcox_test(Opinion ~ pre_or_post, paired = TRUE)
+eff_very_familiar <- know_little %>%
+  wilcox_effsize(Opinion ~ pre_or_post, paired = TRUE)
+
+#calculate averages for each familiarity level
+opinion_sum_s3 <- s3_wilcox_data %>%
+  group_by(Familiarity_seaweed, pre_or_post) %>%
+  summarise(avg = sum(Opinion/length(Opinion)))
+
+```
+
+##Message Testing data and analyses (MA and SW surveys)
+```{r, Data for binomial logistic regressions on message testing, include = FALSE}
+###note to self that what i'm doing here repeats the code in the message heat map chunk and eventually can be consolodated.
+
+#Data for coastal states only#
+s2_binom <- survey_2 %>%
+  dplyr::select(c("Message_1", "Message_2", "Message_3", "Message_4", "Message_5", "Message_6", "Message_7", "Message_8", "Message_9", "Message_10", "Opinion_aqua_pre", "Region_s3"))
+
+#Remove incomplete responses - final n = 153
+s2_binom <- mutate_all(s2_binom, na_if, '#NULL!') 
+s2_binom <- s2_binom[complete.cases(s2_binom),]
+
+#set up opinion to match heat map (unfavorable, neutral/not sure, favorable)
+table(s2_binom$Opinion_aqua_pre)
+s2_binom$Opinion_aqua_pre <- case_when(
+  s2_binom$Opinion_aqua_pre %% 4 == 0 ~ "Neutral/Not sure",
+  s2_binom$Opinion_aqua_pre %% 3 == 0 ~ "Favorable",
+  s2_binom$Opinion_aqua_pre %% 2 == 0 ~ "Neutral/Not sure",
+  s2_binom$Opinion_aqua_pre %% 1 == 0 ~ "Unfavorable"
+)
+
+#Mutate to long-form data
+s2_binom <- s2_binom %>%
+  pivot_longer(cols = Message_1:Message_10, names_to = "Message",
+               values_to = 'rank')
+table(s2_binom$Message, s2_binom$rank)
+
+#Set up rankings to be in three categories: 0 = weak, 1 = strong, 3 = neutral:
+s2_binom$rank_factor <- case_when(
+     s2_binom$rank %% 10 == 0 ~ 1,
+     s2_binom$rank %% 9 == 0 ~ 1,
+     s2_binom$rank %% 8 == 0 ~ 1,
+     s2_binom$rank %% 7 == 0 ~ 1,
+     s2_binom$rank %% 6 == 0 ~ 3,
+     s2_binom$rank %% 5 == 0 ~ 3,
+     s2_binom$rank %% 4 == 0 ~ 0,
+     s2_binom$rank %% 3 == 0 ~ 0,
+     s2_binom$rank %% 2 == 0 ~ 0,
+     s2_binom$rank %% 1 == 0 ~ 0)
+
+#Supplemental table S4 in paper
+table(s2_binom$rank_factor, s2_binom$Message)
+
+#remove the neutral reason group for the binomial
+s2_binom$rank_factor = as.numeric(s2_binom$rank_factor)
+s2_binom <- s2_binom %>%
+  dplyr::filter(rank_factor != 3)
+
+#Survey 3 data for heat map plot without resistant group
+s3_binom <- survey_3 %>%
+  dplyr::select(c("Message_1", "Message_2", "Message_3", "Message_4", "Message_5", "Message_6", "Message_7", "Message_8", "Message_9", "Message_10", "Opinion_seaweed", "Region_factor"))
+table(s3_binom$Opinion_seaweed)
+
+#Remove NAs - final total n = 865
+s3_binom <- mutate_all(s3_binom, na_if, '#NULL!')
+s3_binom <- s3_binom[complete.cases(s3_binom),]
+
+#group opinion into unfavorable, neutral, favorable, never heard
+s3_binom$Opinion_seaweed <- case_when(
+  s3_binom$Opinion_seaweed %% 7 == 0 ~ "Never heard",
+  s3_binom$Opinion_seaweed %% 4 == 0 ~ "Not sure",
+  s3_binom$Opinion_seaweed %% 3 == 0 ~ "Favorable",
+  s3_binom$Opinion_seaweed %% 2 == 0 ~ "Neutral",
+  s3_binom$Opinion_seaweed %% 1 == 0 ~ "Unfavorable"
+)
+
+table(s3_binom$Opinion_seaweed)
+
+#Mutate to long-form data
+s3_binom <- s3_binom %>%
+  pivot_longer(cols = Message_1:Message_10, names_to = "Message",
+               values_to = 'rank')
+
+#Set up rankings to be in three categories: 0 = weak, 1 = strong, 3 = neutral:
+s3_binom$rank_factor <- case_when(
+     s3_binom$rank %% 10 == 0 ~ 1,
+     s3_binom$rank %% 9 == 0 ~ 1,
+     s3_binom$rank %% 8 == 0 ~ 1,
+     s3_binom$rank %% 7 == 0 ~ 1,
+     s3_binom$rank %% 6 == 0 ~ 3,
+     s3_binom$rank %% 5 == 0 ~ 3,
+     s3_binom$rank %% 4 == 0 ~ 0,
+     s3_binom$rank %% 3 == 0 ~ 0,
+     s3_binom$rank %% 2 == 0 ~ 0,
+     s3_binom$rank %% 1 == 0 ~ 0)
+
+#remove the neutral reason group for the binomial
+s3_binom$rank_factor = as.numeric(s3_binom$rank_factor)
+s3_binom <- s3_binom %>%
+  dplyr::filter(rank_factor != 3)
+
+```
+
+```{r, Binomial logistic regressions on message testing, include = FALSE}
+
+#Run the binomial glm for survey2 
+head(s2_binom)
+s2_binom$Opinion_aqua_pre <- as.character(s2_binom$Opinion_aqua_pre)
+s2_binom$Message<- fct_relevel(s2_binom$Message, c("Message_10", "Message_1", "Message_2", "Message_3", "Message_4", "Message_5", "Message_6", "Message_7", "Message_8", "Message_9"))
+glm2 <- glm(rank_factor ~ Message * Opinion_aqua_pre, data = s2_binom, family = "binomial")
+summary(glm2)
+
+glm3 <- glm(rank_factor ~ Message * Region_s3, data = s2_binom, family = "binomial")
+summary(glm3)
+#Test the assumptions
+
+#Test fitted vs. residuals plot to cover dispersion, outliers, uniformity
+
+#simulate the residuals and inspect plots
+output2 <- simulateResiduals(fittedModel = glm2)
+output3 <- simulateResiduals(fittedModel = glm3)
+
+#Uniformity, dispersion, and outliers
+plotQQunif(output2) #Dispersion: p = 0.97, Outlier: p = 0.75, KS test: p = 0.94, deviations not significant.
+plotQQunif(output3)
+plotResiduals(output2) #no significant problems detected
+plotResiduals(output3)
+
+#query the model
+Anova(glm2)
+Anova(glm3) #not significant
+
+#Interpret as odds-ratios with 95% CI
+exp(cbind(OR = coef(glm2), confint(glm2)))
+#pull pairs/contrasts for contrast table
+em2 <- emmeans(glm2, ~Opinion_aqua_pre|Message, type = "response")
+pairs2 <-pairs(em2, adjust = "fdr")
+plot(pairs2)
+#Wald test for an overall effect 
+wald.test(b = coef(glm2), Sigma = vcov(glm2), Terms = 1:3)
+#X2 = 12.4, df = 2, P(> X2) = 0.006 overall model holds.
+
+#Run the binomial glm for survey3
+s3_binom$Opinion_seaweed <- as.character(s3_binom$Opinion_seaweed)
+glm3 <- glm(rank_factor ~ Message*Opinion_seaweed, data = s3_binom, family = "binomial")
+glm4 <- glm(rank_factor ~ Message*Region_factor, data = s3_binom, family = "binomial")
+glm5 <- glm(rank_factor ~ Message, data = s3_binom, family = "binomial")
+summary(glm3)
+summary(glm4)
+#Test the assumptions
+output3 <- simulateResiduals(fittedModel = glm3)
+output4 <- simulateResiduals(fittedModel = glm3)
+#Uniformity, dispersion, and outliers
+plotQQunif(output3) #Dispersion: p = 0.98, Outlier: p = 0.55, KS test: p = 0.46, deviations not significant.
+plotQQunif(output4)
+plotResiduals(output3) #ok with large sample size
+plotResiduals(output4) 
+#query the model
+Anova(glm3)
+Anova(glm4) #not significant
+
+#Interpret as odds-ratios with 95% CI
+exp(cbind(OR = coef(glm5), confint(glm5)))
+#pull pairs/contrasts for contrast table
+em3 <- emmeans(glm3, ~Opinion_seaweed|Message, type = "response")
+pairs3 <-pairs(em3, adjust = "tukey")
+plot(pairs3) +
+  facet_wrap(~Message)
+#Wald test for an overall effect 
+wald.test(b = coef(glm3), Sigma = vcov(glm3), Terms = 2:3)
+#X2 = 103.1, df = 2, P(> X2) = 0.0 #overall model holds.
+
+table(s3_binom$Opinion_seaweed, s3_binom$Message, s3_binom$rank_factor)
+
+```
+
+##Data transformations for figures (MA and SW surveys)
+
+```{r, Data for Figure 1ab, familiarity and opinion}
+#select necessary columns from SW survey data and remove incomplete responses.
+
+plot_1_sw_data <- survey_3 %>%
+  dplyr::select(Opinion_seaweed, Familiarity_sw_factor)
+plot_1_sw_data <- mutate_all(plot_1_sw_data, na_if, '#NULL!') 
+plot_1_sw_data <- plot_1_sw_data[complete.cases(plot_1_sw_data),]
+plot_1_sw_data$sector <- 'b. Seaweed farming'
+
+#remove never heard of seaweed farming category
+plot_1_sw_data <- plot_1_sw_data %>%
+  dplyr::filter(Familiarity_sw_factor != "Never heard of it")
+table(plot_1_sw_data$Opinion_seaweed)
+#remove the 2 that responded 'never heard' in the opinion question
+plot_1_sw_data <- plot_1_sw_data %>%
+  dplyr::filter(Opinion_seaweed != "7")
+
+#need counts of each familiarity group for frequencies
+table(plot_1_sw_data$Familiarity_sw_factor)
+plot_1_sw_data$group_n <- case_when(
+    plot_1_sw_data$Familiarity_sw_factor == "Heard of it but know little about it" ~ "253",
+  plot_1_sw_data$Familiarity_sw_factor == "Somewhat familiar" ~ "183",
+  plot_1_sw_data$Familiarity_sw_factor == "Very familiar" ~ "89")
+
+#create marine aquaculture and familiarity dataframe
+
+plot_1_aq_data <- survey_3 %>%
+  dplyr::select(Opinion_aquaculture, Familiarity_aq_factor)
+plot_1_aq_data <- mutate_all(plot_1_aq_data, na_if, '#NULL!') 
+plot_1_aq_data <- plot_1_aq_data[complete.cases(plot_1_aq_data),]
+plot_1_aq_data$sector <- 'a. Marine aquaculture'
+#remove never heard of marine aquaculture category
+plot_1_aq_data <- plot_1_aq_data %>%
+  dplyr::filter(Familiarity_aq_factor != "Never heard of it")
+table(plot_1_aq_data$Opinion_aquaculture)
+#remove the 1 that responded 'never heard' in the opinion question
+plot_1_aq_data <- plot_1_aq_data %>%
+  dplyr::filter(Opinion_aquaculture != "7")
+
+#need counts of each familiarity group for frequencies
+table(plot_1_aq_data$Familiarity_aq_factor)
+plot_1_aq_data$group_n <- case_when(
+    plot_1_aq_data$Familiarity_aq_factor == "Heard of it but know little about it" ~ "264",
+  plot_1_aq_data$Familiarity_aq_factor == "Somewhat familiar" ~ "252",
+  plot_1_aq_data$Familiarity_aq_factor == "Very familiar" ~ "105")
+table(plot_1_aq_data$group_n)
+
+#working n for marine aquaculture data = 621
+
+#rename columns to combine datasets
+colnames(plot_1_sw_data)[which(names(plot_1_sw_data) == "Familiarity_sw_factor")] <- "Baseline_familiarity"
+
+colnames(plot_1_aq_data)[which(names(plot_1_aq_data) == "Familiarity_aq_factor")] <- "Baseline_familiarity"
+
+colnames(plot_1_sw_data)[which(names(plot_1_sw_data) == "Opinion_seaweed")] <- "Opinion"
+
+colnames(plot_1_aq_data)[which(names(plot_1_aq_data) == "Opinion_aquaculture")] <- "Opinion"
+
+#create the full dataframe
+plot_1_data <- rbind(plot_1_aq_data, plot_1_sw_data, group_n)
+plot_1_data <- mutate_all(plot_1_data, na_if, '174') 
+plot_1_data <- plot_1_data[complete.cases(plot_1_data),]
+
+#rename opinion to favorable, unfavorable, neutral, and not sure.
+table(plot_1_data$Opinion)
+plot_1_data$Opinion_factor <- case_when(
+  plot_1_data$Opinion %% 4 == 0 ~ "Not sure",
+  plot_1_data$Opinion %% 3 == 0 ~ "Favorable",
+  plot_1_data$Opinion %% 2 == 0 ~ "Neutral",
+  plot_1_data$Opinion %% 1 == 0 ~ "Unfavorable")
+
+table(plot_1_data$Opinion_factor)
+
+#table for frequencies
+table_plot_1 <- plot_1_data %>%
+  group_by(Baseline_familiarity, Opinion_factor, sector, group_n) %>%
+  summarise(count = n())
+
+table_plot_1$count = as.numeric(table_plot_1$count)
+table_plot_1$group_n = as.numeric(table_plot_1$group_n)
+table_plot_1$rel.freq <- table_plot_1$count / table_plot_1$group_n
+
+table_plot_1$freq <- (table_plot_1$rel.freq*100)
+```
+
+```{r, Data for Figure 2a-b, echo=FALSE}
+
+#select necessary columns from SW survey data and remove incomplete responses 
+sw_plot_data <- survey_3 %>%
+  dplyr::select(Opinion_seaweed, Opinion_seaweed_post, Familiarity_sw_factor)
+sw_plot_data <- mutate_all(sw_plot_data, na_if, '#NULL!') 
+sw_plot_data <- sw_plot_data[complete.cases(sw_plot_data),]
+
+#Final n = 698 complete responses
+opinion_pre_data <- sw_plot_data %>%
+  dplyr::select(Opinion_seaweed, Familiarity_sw_factor)
+table(opinion_pre_data)
+opinion_post_data <- sw_plot_data %>%
+  dplyr::select(Opinion_seaweed_post, Familiarity_sw_factor)
+
+table(opinion_post_data$Opinion_seaweed_post)
+#remove never heard of seaweed farming category
+opinion_pre_data <- opinion_pre_data %>%
+  dplyr::filter(Familiarity_sw_factor != "Never heard of it")
+table(opinion_pre_data$Opinion_seaweed)
+#remove the 2 that responded 'never heard' in the opinion question
+opinion_pre_data <- opinion_pre_data %>%
+  dplyr::filter(Opinion_seaweed != "7")
+
+opinion_post_data <- opinion_post_data %>%
+  dplyr::filter(Familiarity_sw_factor != "Never heard of it")
+table(opinion_post_data$Familiarity_sw_factor)
+
+#rename opinion to favorable, unfavorable, neutral, and not sure.
+table(opinion_pre_data$Opinion_seaweed)
+opinion_pre_data$Opinion_seaweed <- case_when(
+  opinion_pre_data$Opinion_seaweed %% 4 == 0 ~ "Not sure",
+  opinion_pre_data$Opinion_seaweed %% 3 == 0 ~ "Favorable",
+  opinion_pre_data$Opinion_seaweed %% 2 == 0 ~ "Neutral",
+  opinion_pre_data$Opinion_seaweed %% 1 == 0 ~ "Unfavorable")
+
+table(opinion_post_data$Opinion_seaweed_post)
+opinion_post_data$Opinion_seaweed_post = as.numeric(opinion_post_data$Opinion_seaweed_post)
+
+opinion_post_data$Opinion_seaweed_post <- case_when(
+  opinion_post_data$Opinion_seaweed_post %% 4 == 0 ~ "Not sure",
+  opinion_post_data$Opinion_seaweed_post %% 3 == 0 ~ "Favorable",
+  opinion_post_data$Opinion_seaweed_post %% 2 == 0 ~ "Neutral",
+  opinion_post_data$Opinion_seaweed_post %% 1 == 0 ~ "Unfavorable")
+
+#tables for pre and post
+table_sw_pre <- opinion_pre_data %>%
+  group_by(Familiarity_sw_factor, Opinion_seaweed) %>%
+  summarise(count = n())
+table(opinion_pre_data$Familiarity_sw_factor)
+
+table_sw_pre$group_n <- case_when(
+    table_sw_pre$Familiarity_sw_factor == "Heard of it but know little about it" ~ "251",
+  table_sw_pre$Familiarity_sw_factor == "Somewhat familiar" ~ "182",
+  table_sw_pre$Familiarity_sw_factor == "Very familiar" ~ "89")
+
+table_sw_pre$count = as.numeric(table_sw_pre$count)
+table_sw_pre$group_n = as.numeric(table_sw_pre$group_n)
+table_sw_pre$rel.freq <- table_sw_pre$count / table_sw_pre$group_n
+
+table_sw_post <- opinion_post_data %>%
+  group_by(Familiarity_sw_factor, Opinion_seaweed_post) %>%
+  summarise(count = n())
+
+table(opinion_post_data$Familiarity_sw_factor)
+table_sw_post$group_n <- case_when(
+    table_sw_post$Familiarity_sw_factor == "Heard of it but know little about it" ~ "251",
+  table_sw_post$Familiarity_sw_factor == "Somewhat familiar" ~ "182",
+  table_sw_post$Familiarity_sw_factor == "Very familiar" ~ "89")
+
+table_sw_post$count = as.numeric(table_sw_post$count)
+table_sw_post$group_n = as.numeric(table_sw_post$group_n)
+table_sw_post$rel.freq <- table_sw_post$count / table_sw_post$group_n
+#remove the NAs
+table_sw_post <- table_sw_post[complete.cases(table_sw_post),]
+#rename opinion columns into opinion
+table_sw_pre$Opinion = table_sw_pre$Opinion_seaweed
+table_sw_post$Opinion = table_sw_post$Opinion_seaweed_post
+table_sw_pre <- table_sw_pre %>% dplyr::select(-Opinion_seaweed)
+table_sw_post <- table_sw_post %>% dplyr::select(-Opinion_seaweed_post)
+
+#create a pre/post column for each
+table_sw_pre$video <- "a. Baseline opinion"
+table_sw_post$video <- "b. Post-opinion"
+
+#bind the two datasets
+sw_graph_data <- rbind(table_sw_pre, table_sw_post)
+colnames(sw_graph_data)[which(names(sw_graph_data) == "Familiarity_sw_factor")] <- "group"
+
+#frequency data for never heard of seaweed farming group
+unknown <- survey_3 %>%
+  dplyr::select(Opinion_seaweed_post, Familiarity_sw_factor)
+
+unknown <- unknown %>%
+  dplyr::filter(Familiarity_sw_factor == "Never heard of it")
+unknown <- unknown[complete.cases(unknown),]
+table(unknown$Opinion_seaweed_post)
+unknown$Opinion_seaweed_post = as.numeric(unknown$Opinion_seaweed_post)
+unknown$Opinion_seaweed_post <- case_when(
+  unknown$Opinion_seaweed_post %% 4 == 0 ~ "Not sure",
+  unknown$Opinion_seaweed_post %% 3 == 0 ~ "Favorable",
+  unknown$Opinion_seaweed_post %% 2 == 0 ~ "Neutral",
+  unknown$Opinion_seaweed_post %% 1 == 0 ~ "Unfavorable")
+
+unknown <- unknown %>%
+  group_by(Opinion_seaweed_post) %>%
+  summarise(count = n())
+#People that have never heard of seaweed farming: n = 174 because one person didn't give an opinion post
+unknown$group_n = as.numeric(174)
+unknown$count = as.numeric(unknown$count)
+unknown$rel.freq <- unknown$count / unknown$group_n
+
+#rename opinion column
+colnames(unknown)[which(names(unknown) == "Opinion_seaweed_post")] <- "Opinion"
+unknown$Opinion <- fct_relevel(unknown$Opinion, c("Not sure", "Unfavorable", "Neutral", "Favorable"))
+
+unknown$group <- "Never heard of it"
+unknown$video <- "b. Post-opinion"
+
+sw_graph_data <- rbind(sw_graph_data, unknown)
+
+sw_graph_data$freq <- (sw_graph_data$rel.freq*100)
+
+#create a dataframe for "not asked" (for pre-opinion for the never heard of it group)
+group <- c("Never heard of it")
+count <- c(174)
+group_n <- c(174)
+rel.freq <- c(1.0)
+Opinion <-c("Not asked")
+video <- c("a. Baseline opinion")
+freq <- c(100)
+
+not_asked_data <- as.data.frame(cbind(group, count, group_n, rel.freq, Opinion, video, freq))
+str(not_asked_data)
+not_asked_data$group <- as.character(not_asked_data$group)
+not_asked_data$count <- as.numeric(not_asked_data$count)
+not_asked_data$group_n <- as.numeric(not_asked_data$group_n)
+not_asked_data$rel.freq <- as.numeric(not_asked_data$rel.freq)
+not_asked_data$Opinion <- as.character(not_asked_data$Opinion)
+not_asked_data$video <- as.character(not_asked_data$video)
+not_asked_data$freq <- as.numeric(not_asked_data$freq)
+
+sw_graph_data <- rbind(sw_graph_data, not_asked_data)
+str(sw_graph_data)
+
+#create a dataframe for the marine aquaculture pre-post opinions from the MA survey to add the the graph
+ma_data <- survey_2
+str(ma_data)
+ma_data$Opinion_aqua_pre = as.numeric(ma_data$Opinion_aqua_pre)
+
+ma_data$Opinion_aqua_pre <- case_when(
+  ma_data$Opinion_aqua_pre %% 4 == 0 ~ "Not sure",
+  ma_data$Opinion_aqua_pre %% 3 == 0 ~ "Favorable",
+  ma_data$Opinion_aqua_pre %% 2 == 0 ~ "Neutral",
+  ma_data$Opinion_aqua_pre %% 1 == 0 ~ "Unfavorable")
+
+ma_data$Opinion_aqua_post = as.numeric(ma_data$Opinion_aqua_post)
+ma_data$Opinion_aqua_post <- case_when(
+  ma_data$Opinion_aqua_post %% 4 == 0 ~ "Not sure",
+  ma_data$Opinion_aqua_post %% 3 == 0 ~ "Favorable",
+  ma_data$Opinion_aqua_post %% 2 == 0 ~ "Neutral",
+  ma_data$Opinion_aqua_post %% 1 == 0 ~ "Unfavorable")
+
+ma_pre_data <- ma_data %>%
+  select(Opinion_aqua_pre)
+
+ma_post_data <- ma_data %>%
+  select(Opinion_aqua_post)
+
+ma_pre_data$video <- c("a. Baseline opinion")
+ma_post_data$video <- c("b. Post-opinion")
+ma_pre_data$Opinion <- ma_pre_data$Opinion_aqua_pre
+ma_pre_data <- ma_pre_data %>% dplyr::select(-Opinion_aqua_pre)
+ma_post_data$Opinion <- ma_post_data$Opinion_aqua_post
+ma_post_data <- ma_post_data %>% dplyr::select(-Opinion_aqua_post)
+
+ma_data <- rbind(ma_pre_data, ma_post_data)
+ma_data$group <- c("Marine aquaculture (MA survey)")
+ma_data$group_n <- c(154)
+ma_data <- ma_data[complete.cases(ma_data),]
+#frequencies
+table_ma <- ma_data %>%
+  group_by(Opinion, video) %>%
+  summarise(count = n())
+table(opinion_pre_data$Familiarity_sw_factor)
+table_ma$rel.freq <- table_ma$count / 154
+table_ma$freq <- (table_ma$rel.freq*100)
+table_ma$group_n <- c(154)
+table_ma$group <- c("Marine aquaculture (MA survey)")
+
+table_ma$group <- as.character(table_ma$group)
+table_ma$count <- as.numeric(table_ma$count)
+table_ma$group_n <- as.numeric(table_ma$group_n)
+table_ma$rel.freq <- as.numeric(table_ma$rel.freq)
+table_ma$Opinion <- as.character(table_ma$Opinion)
+table_ma$video <- as.character(table_ma$video)
+table_ma$freq <- as.numeric(table_ma$freq)
+
+
+```
+
+```{r, Data for Figure 3a-b, echo = FALSE}
+#Data for coastal states only#
+s2_data <- survey_2 %>%
+  dplyr::select(c("Message_1", "Message_2", "Message_3", "Message_4", "Message_5", "Message_6", "Message_7", "Message_8", "Message_9", "Message_10", "Opinion_aqua_pre", "Region_s3"))
+
+#Remove NAs - final n = 153
+s2_data <- mutate_all(s2_data, na_if, '#NULL!') 
+s2_data <- s2_data[complete.cases(s2_data),]
+table(s2_data$Opinion_aqua_pre)
+#group opinion into unfavorable, neutral, favorable
+s2_data$Opinion_aqua_pre <- case_when(
+  s2_data$Opinion_aqua_pre %% 3 == 0 ~ "Favorable",
+  s2_data$Opinion_aqua_pre %% 2 == 0 ~ "Not sure or Neutral",
+  s2_data$Opinion_aqua_pre %% 1 == 0 ~ "Unfavorable"
+)
+
+#Mutate to long-form data
+s2_data <- s2_data %>%
+  pivot_longer(cols = Message_1:Message_10, names_to = "Message",
+               values_to = 'rank')
+
+
+#Set up rankings to be in three categories: strong, neutral, weak:
+s2_data$rank_factor <- case_when(
+     s2_data$rank %% 10 == 0 ~ "strong reason",
+     s2_data$rank %% 9 == 0 ~ "strong reason",
+     s2_data$rank %% 8 == 0 ~ "strong reason",
+     s2_data$rank %% 7 == 0 ~ "strong reason",
+     s2_data$rank %% 6 == 0 ~ "neutral reason",
+     s2_data$rank %% 5 == 0 ~ "neutral reason",
+     s2_data$rank %% 4 == 0 ~ "weak reason",
+     s2_data$rank %% 3 == 0 ~ "weak reason",
+     s2_data$rank %% 2 == 0 ~ "weak reason",
+     s2_data$rank %% 1 == 0 ~ "weak reason")
+
+#Supplemental table S4 in paper
+table(s2_data$rank_factor, s2_data$Message)
+
+#Frequencies for heat map
+#Group by Message, group, and rank_factor to get frequency table
+
+s2_table <- s2_data %>%
+  group_by(rank_factor, Message, Opinion_aqua_pre) %>%
+  summarise(count = n())
+
+s2_table$group_n <- case_when(
+    s2_table$Opinion_aqua_pre == "Favorable" ~ "69", 
+  s2_table$Opinion_aqua_pre == "Not sure or Neutral" ~ "65", 
+  s2_table$Opinion_aqua_pre == "Unfavorable" ~ "19")
+
+s2_table$count = as.numeric(s2_table$count)
+s2_table$group_n = as.numeric(s2_table$group_n)
+s2_table$rel.freq <- s2_table$count / s2_table$group_n
+
+s2_graph_data <- s2_table
+
+#remove the neutral reason group for simplified graph
+s2_graph_data <- s2_graph_data %>%
+  dplyr::filter(rank_factor != "neutral reason")
+
+#new column with colors needed in the tiles -- new plot
+s2_graph_data$color <- case_when(
+  s2_graph_data$Message == "Message_10" ~ "Environmental",
+  s2_graph_data$Message == "Message_9" ~ "Social",
+  s2_graph_data$Message == "Message_8" ~ "Environmental",
+  s2_graph_data$Message == "Message_7" ~ "Social and Environmental",
+  s2_graph_data$Message == "Message_6" ~ "Environmental",
+  s2_graph_data$Message == "Message_5" ~ "Social",
+  s2_graph_data$Message == "Message_4" ~ "Social and Economic",
+  s2_graph_data$Message == "Message_3" ~  "Economic", #"Economic and Environmental",
+  s2_graph_data$Message == "Message_2" ~ "Economic",
+  s2_graph_data$Message == "Message_1" ~ "Economic")
+
+#new column with descriptive message
+s2_graph_data$message_factor <- case_when(
+  s2_graph_data$Message == "Message_10" ~ "Sustainable alternative to wild fisheries.",
+  s2_graph_data$Message == "Message_9" ~ "More affordable seafood.",
+  s2_graph_data$Message == "Message_8" ~ "U.S. regulations protect the environment.",
+  s2_graph_data$Message == "Message_7" ~ "Decreases mislabeling and fraud.",
+  s2_graph_data$Message == "Message_6" ~ "Better than land-based.",
+  s2_graph_data$Message == "Message_5" ~ "Strict U.S. laws make products safe.",
+  s2_graph_data$Message == "Message_4" ~ "Meets growing demand for domestic seafood.",
+  s2_graph_data$Message == "Message_3" ~ "Helps U.S. reduce its trade deficit.",
+  s2_graph_data$Message == "Message_2" ~ "Reduces U.S. imports.",
+  s2_graph_data$Message == "Message_1" ~ "Creates jobs, supports coastal economies.")
+
+s2_graph_data$Opinion_aqua_pre = fct_relevel(s2_graph_data$Opinion_aqua_pre, c("Unfavorable", "Not sure or Neutral", "Favorable"))
+
+s2_graph_data$rank_factor = fct_relevel(s2_graph_data$rank_factor, c("weak reason", "strong reason"))
+
+#Survey 3 data for heat map plot without resistant group
+s3_data <- survey_3 %>%
+  dplyr::select(c("Message_1", "Message_2", "Message_3", "Message_4", "Message_5", "Message_6", "Message_7", "Message_8", "Message_9", "Message_10", "Opinion_seaweed"))
+table(survey_3$Opinion_seaweed)
+
+#Remove NAs - final total n = 865
+s3_data <- mutate_all(s3_data, na_if, '#NULL!')
+s3_data <- s3_data[complete.cases(s3_data),]
+
+#group opinion into unfavorable, neutral, favorable, never heard
+s3_data$Opinion_seaweed <- case_when(
+  s3_data$Opinion_seaweed %% 7 == 0 ~ "Never heard",
+  s3_data$Opinion_seaweed %% 4 == 0 ~ "Not sure",
+  s3_data$Opinion_seaweed %% 3 == 0 ~ "Favorable",
+  s3_data$Opinion_seaweed %% 2 == 0 ~ "Neutral",
+  s3_data$Opinion_seaweed %% 1 == 0 ~ "Unfavorable"
+)
+
+table(s3_data$Opinion_seaweed)
+
+#Mutate to long-form data
+s3_data <- s3_data %>%
+  pivot_longer(cols = Message_1:Message_10, names_to = "Message",
+               values_to = 'rank')
+
+#Set up rankings to be in three categories: strong, neutral, weak:
+s3_data$rank_factor <- case_when(
+     s3_data$rank %% 10 == 0 ~ "strong reason",
+     s3_data$rank %% 9 == 0 ~ "strong reason",
+     s3_data$rank %% 8 == 0 ~ "strong reason",
+     s3_data$rank %% 7 == 0 ~ "strong reason",
+     s3_data$rank %% 6 == 0 ~ "neutral reason",
+     s3_data$rank %% 5 == 0 ~ "neutral reason",
+     s3_data$rank %% 4 == 0 ~ "weak reason",
+     s3_data$rank %% 3 == 0 ~ "weak reason",
+     s3_data$rank %% 2 == 0 ~ "weak reason",
+     s3_data$rank %% 1 == 0 ~ "weak reason")
+
+#Supplemental table S4 in paper
+table(s3_data$rank_factor, s3_data$Message)
+
+#counts for message rank by baseline familiarity
+counts <- table(s3_data$rank, s3_data$Message, s3_data$Opinion_seaweed)
+
+#Frequencies for heat map
+
+#Frequency table for each grouping
+s3_graph_data <- s3_data %>%
+  group_by(rank_factor, Message, Opinion_seaweed) %>%
+  summarise(count = n())
+
+s3_graph_data$group_n <- case_when(
+  s3_graph_data$Opinion_seaweed == "Favorable" ~ "277",
+  s3_graph_data$Opinion_seaweed == "Neutral" ~ "169",
+  s3_graph_data$Opinion_seaweed == "Never heard" ~ "181",
+  s3_graph_data$Opinion_seaweed == "Not sure" ~ "41",
+  s3_graph_data$Opinion_seaweed == "Unfavorable" ~ "38")
+
+s3_graph_data$count = as.numeric(s3_graph_data$count)
+s3_graph_data$group_n = as.numeric(s3_graph_data$group_n)
+s3_graph_data$rel.freq <- s3_graph_data$count / s3_graph_data$group_n
+
+#new column with colors needed in the tiles
+s3_graph_data$color <- case_when(
+  s3_graph_data$Message == "Message_10" ~ "Social",
+  s3_graph_data$Message == "Message_9" ~ "Environmental",
+  s3_graph_data$Message == "Message_8" ~ "Economic and Environmental",
+  s3_graph_data$Message == "Message_7" ~ "Economic",
+  s3_graph_data$Message == "Message_6" ~ "Economic",
+  s3_graph_data$Message == "Message_5" ~ "Social",
+  s3_graph_data$Message == "Message_4" ~ "Economic",
+  s3_graph_data$Message == "Message_3" ~ "Environmental",
+  s3_graph_data$Message == "Message_2" ~ "Environmental",
+  s3_graph_data$Message == "Message_1" ~ "Environmental")
+
+s3_graph_data$message_factor <- case_when(
+  s3_graph_data$Message == "Message_10" ~ "Sustainable domestic food supply.",
+  s3_graph_data$Message == "Message_9" ~ "Source for clean, renewable energy.",
+  s3_graph_data$Message == "Message_8" ~ "Siting with science-based tools.",
+  s3_graph_data$Message == "Message_7" ~ "Source of 'green' jobs.",
+  s3_graph_data$Message == "Message_6" ~ "Reduces imports, creates local jobs.",
+  s3_graph_data$Message == "Message_5" ~ "Natural and healthy food source.",
+  s3_graph_data$Message == "Message_4" ~ "Diversifies fishermen's income.",
+  s3_graph_data$Message == "Message_3" ~ "Fewer greenhouse gases.",
+  s3_graph_data$Message == "Message_2" ~ "Improves water quality.",
+  s3_graph_data$Message == "Message_1" ~ "Better than land-based.")
+
+#remove the neutral reason group for simplified graph
+s3_graph_data <- s3_graph_data %>%
+  dplyr::filter(rank_factor != "neutral reason")
+
+s3_graph_data$Opinion_seaweed <- fct_relevel(s3_graph_data$Opinion_seaweed, c("Never heard", "Not sure", "Unfavorable", "Neutral", "Favorable"))
+
+s3_graph_data$rank_factor = fct_relevel(s3_graph_data$rank_factor, c("weak reason", "strong reason"))
+
+```
+
+```{r, Data for Figure 4, include = FALSE}
+table(survey_3$Scientists)
+table(survey_3$Government)
+table(survey_3$NGO)
+table(survey_3$Aquarium_museum)
+table(survey_3$Chefs)
+table(survey_3$Grocer)
+table(survey_3$Fishermen)
+table(survey_3$Seafood_farmer)
+
+#Trust data messy code from trust question tables
+source <- c("Scientists", "Seafood farmers", "Fishermen", "Aquariums & museums", "Professional chefs", "Grocer or fish monger", "Government organizations", "Nongovernment organizations (NGOs)")
+group <- c("Trust (4-5)", "Trust (4-5)", "Trust (4-5)", "Trust (4-5)", "Trust (4-5)", "Trust (4-5)", "Trust (4-5)", "Trust (4-5)")
+freq_3 <- c(74, 62, 60, 60, 45, 37, 35, 19)
+color <- c(">50% Trust", ">50% Trust",">50% Trust",">50% Trust", "<50% Trust", "<50% Trust","<50% Trust","<50% Trust")
+
+trust_data <- as.data.frame(cbind(source, group, freq_3, color))
+str(trust_data)
+trust_data$freq_3 = as.numeric(trust_data$freq_3)
+trust_data$source = as.factor(trust_data$source)
+trust_data$group = as.factor(trust_data$group)
+trust_data$color = as.factor(trust_data$color)
+```
+
+##Code for figures (MA and SW surveys)
+
+```{r, Figure 1a-b, echo = FALSE}
+table_plot_1$Opinion_factor <- fct_relevel(table_plot_1$Opinion_factor, c("Not sure", "Unfavorable", "Neutral", "Favorable"))
+table_plot_1$Baseline_familiarity <- fct_relevel(table_plot_1$Baseline_familiarity, c("Heard of it but know little about it", "Somewhat familiar", "Very familiar"))
+table_plot_1$sector <- fct_relevel(table_plot_1$sector, c("a. Marine aquaculture", "b. Seaweed farming"))
+
+fig_1ab <- ggplot(data = table_plot_1,
+  mapping = aes(x = Baseline_familiarity, y = freq, fill = Opinion_factor)) +
+  geom_bar(width = 0.8, position = "stack", stat = "identity", colour = "white", size = 0.1) +
+  facet_grid(~sector) +
+  scale_fill_manual(values = c("#FDE725FF", "#3cBB75FF", "#39568CFF", "#440154FF"),guide= guide_legend(reverse = TRUE))+
+  xlab("Baseline familiarity") +
+  ylab("Response frequency (%)") +
+  theme_bw()+
+  scale_y_continuous(expand = c(0.01,0), 
+                     breaks = c(25, 50, 75))+
+  theme(legend.position = "top",
+        legend.justification = "left",
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 8),
+        legend.margin = margin(0,0,0,0),
+        legend.box.margin = margin(-10,-10,-10,-10)) +
+  theme(axis.text.x = element_text(size = 8),
+        axis.title.x = element_text(size = 8, face = "bold"),
+        axis.text.y = element_text(size = 8),
+        axis.title.y = element_text(size = 8, angle = 90, face = "bold"),
+        plot.title = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(), 
+        strip.text.y = element_text(size=7),
+        strip.text.x = element_text(size =7))+
+  theme(panel.border = element_rect(size = 0.5))+
+  scale_x_discrete(labels = scales::wrap_format(22))+
+  theme(panel.spacing = unit(5.0, "pt"))+
+  theme(legend.key.size = unit (0.25, "cm"))+
+  labs(fill = "Baseline opinion:")
+
+fig_1ab <- fig_1ab + coord_flip()
+fig_1ab <- fig_1ab + theme(aspect.ratio = 1/1.8)
+ggsave("fig_1ab.tiff", plot = fig_1ab, width = 5, height = 3, units = "in", dpi = 600)
+
+
+
+```
+
+```{r, Figure 2a-b, echo = FALSE}
+sw_graph_data$Opinion <- fct_relevel(sw_graph_data$Opinion, c("Not asked", "Not sure", "Unfavorable", "Neutral", "Favorable"))
+sw_graph_data$group <- fct_relevel(sw_graph_data$group, c("Never heard of it", "Heard of it but know little about it", "Somewhat familiar", "Very familiar"))
+sw_graph_data$video <- fct_relevel(sw_graph_data$video, c("a. Baseline opinion", "b. Post-opinion"))
+
+sw_plot <- ggplot(data = sw_graph_data,
+                mapping = aes(x = group, y = freq, fill = Opinion
+                )) +
+  geom_bar(width = 0.8, position = "stack", stat = "identity", colour = "white", size = 0.1) +
+  facet_grid(~video) +
+  #scale_fill_viridis_d(direction = -1) +
+  scale_fill_manual(values = c("grey78", "#FDE725FF", "#3cBB75FF", "#39568CFF", "#440154FF"),
+                    guide= guide_legend(reverse = TRUE))+
+  xlab("Baseline familiarity") +
+  ylab("Response frequency (%)") +
+  theme_bw()+
+  scale_y_continuous(expand = c(0.01,0), 
+                     breaks = c(25, 50, 75))+
+  theme(legend.position = "top",
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.margin = margin(0,0,0,0),
+        legend.box.margin = margin(-10,-10,-10,-10)) +
+  theme(axis.text.x = element_text(size = 5.5),
+        axis.title.x = element_text(size = 7, face = "bold"),
+        axis.text.y = element_text(size = 6),
+        axis.title.y = element_text(size = 7, angle = 90, face = "bold"),
+        plot.title = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(), 
+        strip.text.y = element_text(size=7),
+        strip.text.x = element_text(size =7))+
+  theme(panel.border = element_rect(size = 0.5))+
+  scale_x_discrete(labels = scales::wrap_format(22))+
+  theme(panel.spacing = unit(5.0, "pt"))+
+  theme(legend.key.size = unit (0.25, "cm"))
+
+sw_plot <- sw_plot + coord_flip()
+sw_plot + theme(aspect.ratio = 1/1.8)
+ggsave("sw_plot.tiff", plot = sw_plot, width = 4.5, height = 3, units = "in", dpi = 600)
+
+#marine aquaculture plot
+str(table_ma)
+table_ma <- as.data.frame(table_ma)
+table_ma$Opinion = as.factor(table_ma$Opinion)
+table_ma$Opinion <- fct_relevel(table_ma$Opinion, c("Not sure", "Unfavorable", "Neutral", "Favorable"))
+table_ma$video <- fct_relevel(table_ma$video, c("b. Post-opinion", "a. Baseline opinion"))
+
+ma_plot <- ggplot(data = table_ma,
+  mapping = aes(x = video, y = freq, fill = Opinion)) +
+  geom_bar(width = 0.8, position = "stack", stat = "identity", colour = "white", size = 0.1) +
+  #scale_fill_viridis_d(direction = -1) +
+  scale_fill_manual(values = c("#FDE725FF", "#3cBB75FF", "#39568CFF", "#440154FF"),
+  guide= guide_legend(reverse = TRUE))+
+  ylab("Response frequency (%)") +
+  theme_bw()+
+  scale_y_continuous(expand = c(0.01,0), 
+                     breaks = c(0, 25, 50, 75, 100))+
+  theme(legend.position = "top",
+        legend.title = element_text(size = 7),
+        legend.text = element_text(size = 6),
+        legend.margin = margin(0,0,0,0),
+        legend.box.margin = margin(-10,-10,-10,-10)) +
+  theme(axis.text.x = element_text(size = 5.5),
+        axis.title.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6),
+        axis.title.y = element_blank(),
+        plot.title = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(), 
+        strip.text.y = element_text(size=7),
+        strip.text.x = element_text(size =7))+
+  theme(panel.border = element_rect(size = 0.5))+
+  scale_x_discrete(labels = scales::wrap_format(22))+
+  theme(legend.key.size = unit (0.25, "cm"))+
+  theme(aspect.ratio = 1/1.8) 
+
+ma_plot <- ma_plot + coord_flip()
+
+ggsave("ma_plot.tiff", plot = ma_plot, width = 4.5, height = 3, units = "in", dpi = 600)
+
+```
+
+```{r, Figure 3a, echo = FALSE}
+
+s2_graph_data$color <- fct_relevel(s2_graph_data$color, c("Environmental", "Social and Environmental", "Social", "Social and Economic", "Economic"))#, "Economic and Environmental"))
+
+s2_graph_data$Message <- fct_relevel(s2_graph_data$Message, c("Message_3", "Message_2", "Message_1","Message_4","Message_9","Message_5","Message_7","Message_6","Message_8","Message_10"))
+
+s2_graph_data$message_factor <- fct_relevel(s2_graph_data$message_factor, c("Helps U.S. reduce its trade deficit.", "Reduces U.S. imports.", "Creates jobs, supports coastal economies.", "Meets growing demand for domestic seafood.", "More affordable seafood.", "Strict U.S. laws make products safe.", "Decreases mislabeling and fraud.", "Better than land-based.", "U.S. regulations protect the environment.", "Sustainable alternative to wild fisheries."))
+
+s2_heat_map_group <- ggplot(s2_graph_data, aes(y = message_factor, x = Opinion_aqua_pre, fill = color, alpha = rel.freq)) +
+  geom_tile(colour = "white", size = 0.02) +
+  facet_grid(~rank_factor) +
+  theme_bw() +
+  scale_fill_manual(values = c("Environmental" = "#006400", "Social and Economic" = "#8B0000", "Social" = "#440154FF", "Economic" = "#21908CFF", "Social and Environmental" = "#e1b941")) + #, "Economic and Environmental" = "#d86c00")) +
+  scale_alpha_continuous(breaks = c(0.2, 0.4, 0.6, 0.8)) +
+  theme(panel.grid = element_blank()) +
+  coord_cartesian(expand = FALSE) +
+   theme(axis.text.x = element_text(size = 9), #angle=-50, hjust=0, size = 10),
+        axis.text.y = element_text(size=9),
+        plot.background = element_rect(fill='transparent'),
+        strip.text.y = element_text(size= 7),
+        strip.text.x = element_text(size = 7)) +
+  theme(legend.position = 'top') +
+  theme(axis.title = element_blank()) +
+  labs(fill = "Message Theme", alpha = "Percent Gradient")
+s2_heat_map_group
+
+figure_2a_legend <- s2_heat_map_group + 
+  scale_y_discrete(labels = scales::wrap_format(25))+
+  scale_x_discrete(labels = scales::wrap_format(11)) +
+  #theme(legend.position = "none")+
+  theme(legend.position = 'right',
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 8))+
+  theme(legend.key.size = unit (0.5, "cm"))+
+  theme(panel.spacing = unit(1,"pt"))+
+  ggtitle("3a: MA survey messages") +
+  theme(plot.title = element_text(size = 8, hjust = -0.28, face = "bold"),
+        legend.title=element_text(size = 8, face = "bold")) +
+  theme(plot.background = element_rect(fill = 'white'))
+
+ggsave("figure_3a.png", plot = figure_2a_legend, dpi = 600)
+
+#Save figure legend as object to add to combined graph.
+get_legend <- function(myggplot){
+  tmp <- ggplot_gtable(ggplot_build(myggplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)
+}
+legend <- get_legend(figure_2a_legend)
+
+ggsave("figure_3a.png", plot = figure_2a, width = 3.5, height = 3.3, units = "in", dpi = 600)
+
+#save the figure with no legend
+figure_2a <- s2_heat_map_group + 
+  scale_y_discrete(labels = scales::wrap_format(25))+
+  scale_x_discrete(labels = scales::wrap_format(11)) +
+  theme(legend.position = "none")+
+  theme(panel.spacing = unit(1,"pt"))+
+  ggtitle("3a: MA survey messages") +
+  theme(plot.title = element_text(size = 8, hjust = -0.3, face = "bold"),
+        legend.title=element_text(size = 7, face = "bold"))
+
+```
+
+```{r, Figure 3b, echo = FALSE}
+
+s3_graph_data$color <- fct_relevel(s3_graph_data$color, c("Environmental","Economic and Environmental", "Social", "Economic"))
+
+s3_graph_data$message_factor <- fct_relevel(s3_graph_data$message_factor, c("Reduces imports, creates local jobs.", "Source of 'green' jobs.", "Diversifies fishermen's income.","Sustainable domestic food supply.","Natural and healthy food source.","Siting with science-based tools.","Source for clean, renewable energy.","Fewer greenhouse gases.","Improves water quality.","Better than land-based."))
+
+s3_heat_map_group <- ggplot(s3_graph_data, aes(y = message_factor, x = Opinion_seaweed, fill = color, alpha = rel.freq)) +
+  geom_tile(colour = "white", size = 0.02) +
+  facet_grid(~rank_factor) +
+  theme_bw() +
+ scale_fill_manual(values = c("Environmental" = "#006400", "Social" = "#440154FF", "Economic" = "#21908CFF", "Economic and Environmental" = "#d86c00")) +
+  scale_alpha_continuous(breaks = c(0.2, 0.4, 0.6, 0.8)) +
+  theme(panel.grid = element_blank()) +
+  coord_cartesian(expand = FALSE) +
+   theme(axis.text.x = element_text(size = 7),
+        axis.text.y = element_text(size=9),
+        strip.text.y = element_text(size=7),
+        strip.text.x = element_text(size =7)) + 
+  theme(axis.title = element_blank()) +
+  labs(fill = "Message Theme", alpha = "Percent gradient") 
+
+figure_2b <- s3_heat_map_group +
+  scale_y_discrete(labels = scales::wrap_format(27))+
+  scale_x_discrete(labels = scales::wrap_format(11))+
+  theme(legend.position = "right") +
+  theme(legend.key.size = unit(0.5, 'cm')) +
+  theme(panel.spacing = unit(1,"pt"))+
+  ggtitle("3b: SW survey messages") +
+  theme(plot.title = element_text(size = 8, hjust = -0.28, face = "bold"))
+
+ggsave("figure_3b.png", plot = figure_2b, dpi = 600)
+
+library(patchwork)
+library(gridExtra)
+#top center legend
+figure_2 <- grid.arrange(legend, figure_2a, figure_2b, ncol = 2, nrow = 2, 
+             layout_matrix = rbind(c(1,1), c(2,3)),
+             widths = c(4, 4), heights = c(0.2, 1.5))
+
+
+ggsave("figure_3ab.tiff", plot = figure_2, width = 7, height = 4, units = "in", dpi = 600)
+
+```
+
+```{r, Figure 4, echo = FALSE}
+
+trust_data$source <- fct_relevel(trust_data$source, c("Nongovernment organizations (NGOs)", "Government organizations", "Grocer or fish monger","Professional chefs", "Aquariums & museums", "Fishermen","Seafood farmers" ,"Scientists"))
+trust_data$color <- fct_relevel(trust_data$color, c(">50% Trust", "<50% Trust"))
+
+trust_plot <- ggplot(data = trust_data,
+                mapping = aes(x = freq_3, y = source)) +
+  geom_col(width = 0.75, position = "dodge2", colour = "black", size = 0.1, fill = "azure4") +
+  theme_classic() +
+  scale_x_continuous(limits = c(0, 100), expand = c(0.01,0))+
+  xlab("Percent (%) of respondents \nindicating a high level of trust")+
+  ylab("Source of information")+
+  theme(axis.text.x = element_text(size = 5.8),
+        axis.text.y = element_text(size = 5.8),
+        axis.title.x = element_text(size = 6.5, face = "bold", hjust = 0.5),
+        axis.title.y = element_text(size = 6.5, face = "bold"),
+        plot.title = element_blank(),
+        legend.title = element_blank()) +
+  scale_y_discrete(labels = scales::wrap_format(25))+
+  theme(axis.line.x.bottom = element_line(size = 0.4),
+        axis.line.y.left = element_line(size = 0.4))+
+    theme(aspect.ratio = 1/1.8)
+
+trust_plot 
+ggsave("trust_plot.tiff", plot = trust_plot, width = 3.42, height = 2, units = "in", dpi = 600)
+```
+
+#Other analyses (not in paper) 
+
+##Sociodemographics (MA and SW surveys)
+```{r, early analyses: ChiSquare on baseline opinion by sociodemographic factors (both MA and SW surveys), include = FALSE}
+
+#NOTE we looked at unfavorable and favorable opinions, removing neutral, not sure, and never heard. See regressions for full analyses which were also not significant. 
+
+region_opinion_s2 <- survey_2 %>%
+  dplyr::select(c(Opinion_aqua_pre, Region_s3))
+table(region_opinion_s2$Opinion_aqua_pre)
+#test favorable and unfavorable views
+region_opinion_s2 <- region_opinion_s2 %>%
+  dplyr::filter(Opinion_aqua_pre != 2)
+region_opinion_s2 <- region_opinion_s2 %>%
+  dplyr::filter(Opinion_aqua_pre != 4)
+
+region_opinion_s2_table <- table(region_opinion_s2$Region_s3, region_opinion_s2$Opinion_aqua_pre)
+region_chi <- chisq.test(region_opinion_s2_table)
+#region is not significant
+
+race_opinion_s2 <- survey_2 %>%
+  dplyr::select(c(Opinion_aqua_pre, Race_factor))
+race_opinion_s2 <- race_opinion_s2 %>%
+  dplyr::filter(Opinion_aqua_pre != 2)
+race_opinion_s2 <- race_opinion_s2 %>%
+  dplyr::filter(Opinion_aqua_pre != 4)
+table(race_opinion_s2$Opinion_aqua_pre)
+race_opinion_s2_table <- table(race_opinion_s2$Race_factor, race_opinion_s2$Opinion_aqua_pre)
+race_chi <- chisq.test(race_opinion_s2_table)
+#Race is not significant but also heavily skewed towards White population
+  
+edu_opinion_s2 <-survey_2 %>%
+  dplyr::select(c(Opinion_aqua_pre, Education_collapsed))
+edu_opinion_s2 <- edu_opinion_s2 %>%
+  dplyr::filter(Opinion_aqua_pre != 2)
+edu_opinion_s2 <- edu_opinion_s2 %>%
+  dplyr::filter(Opinion_aqua_pre != 4)
+table(edu_opinion_s2$Opinion_aqua_pre)
+edu_opinion_s2 <- table(edu_opinion_s2$Education_collapsed, edu_opinion_s2$Opinion_aqua_pre)
+edu_chi <- chisq.test(edu_opinion_s2)
+edu_expected <- round(edu_chi$expected, 1)
+#significant (p=0.002) but also a skewed population towards specific bins
+
+
+####Survey 3####
+region_opinion_s3 <- survey_3 %>%
+  dplyr::select(c(Opinion_seaweed, Region_factor))
+table(region_opinion_s3$Opinion_seaweed)
+#test favorable and unfavorable views
+region_opinion_s3 <- region_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 2)
+region_opinion_s3 <- region_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 4)
+region_opinion_s3 <- region_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 7)
+
+region_opinion_s3_table <- table(region_opinion_s3$Region_factor, region_opinion_s3$Opinion_seaweed)
+region_chi_sw <- chisq.test(region_opinion_s3_table)
+#region is not significant
+
+race_opinion_s3 <- survey_3 %>%
+  dplyr::select(c(Opinion_seaweed, Race_factor))
+race_opinion_s3 <- race_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 2)
+race_opinion_s3 <- race_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 4)
+race_opinion_s3 <- race_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 7)
+table(race_opinion_s3$Opinion_seaweed)
+race_opinion_s3_table <- table(race_opinion_s3$Race_factor, race_opinion_s3$Opinion_seaweed)
+race_chi_sw <- chisq.test(race_opinion_s3_table)
+#Race is not significant but also heavily skewed towards White population
+  
+edu_opinion_s3 <-survey_3 %>%
+  dplyr::select(c(Opinion_seaweed, Education_collapsed))
+edu_opinion_s3 <- edu_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 2)
+edu_opinion_s3 <- edu_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 4)
+edu_opinion_s3 <- edu_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 7)
+table(edu_opinion_s3$Opinion_seaweed)
+edu_opinion_s3 <- table(edu_opinion_s3$Education_collapsed, edu_opinion_s3$Opinion_seaweed)
+edu_chi_sw <- chisq.test(edu_opinion_s3)
+#Education is not significant and is also skewed.
+
+age_opinion_s3 <-survey_3 %>%
+  dplyr::select(c(Opinion_seaweed, Age_factor))
+age_opinion_s3 <- age_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 2)
+age_opinion_s3 <- age_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 4)
+age_opinion_s3 <- age_opinion_s3 %>%
+  dplyr::filter(Opinion_seaweed != 7)
+table(age_opinion_s3$Opinion_seaweed)
+age_opinion_s3 <- table(age_opinion_s3$Age_factor, age_opinion_s3$Opinion_seaweed)
+age_chi_sw <- chisq.test(age_opinion_s3)
+#age is not significant here.
+
+##Survey 3 opinion aquaculture
+region_op_aq_s3 <- survey_3 %>%
+  dplyr::select(c(Opinion_aquaculture, Region_factor))
+table(region_op_aq_s3$Opinion_aquaculture)
+#test favorable and unfavorable views
+region_op_aq_s3 <- region_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 2)
+region_op_aq_s3 <- region_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 4)
+region_op_aq_s3 <- region_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 7)
+
+region_op_aq_table <- table(region_op_aq_s3$Region_factor, region_op_aq_s3$Opinion_aquaculture)
+region_chi_aq_s3 <- chisq.test(region_op_aq_table)
+#region is not significant
+
+race_op_aq_s3 <- survey_3 %>%
+  dplyr::select(c(Opinion_aquaculture, Race_factor))
+race_op_aq_s3 <- race_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 2)
+race_op_aq_s3 <- race_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 4)
+race_op_aq_s3 <- race_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 7)
+table(race_op_aq_s3$Opinion_aquaculture)
+race_op_aq_table <- table(race_op_aq_s3$Race_factor, race_op_aq_s3$Opinion_aquaculture)
+race_chi_aq_s3 <- chisq.test(race_op_aq_table)
+#Race is not significant but also heavily skewed towards White population
+  
+edu_op_aq_s3 <-survey_3 %>%
+  dplyr::select(c(Opinion_aquaculture, Education_collapsed))
+edu_op_aq_s3 <- edu_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 2)
+edu_op_aq_s3 <- edu_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 4)
+edu_op_aq_s3 <- edu_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 7)
+table(edu_op_aq_s3$Opinion_aquaculture)
+edu_op_aq_s3_table <- table(edu_op_aq_s3$Education_collapsed, edu_op_aq_s3$Opinion_aquaculture)
+edu_chi_aq_s3 <- chisq.test(edu_op_aq_s3_table)
+expected_edu_chi_aq_s3 <- round(edu_chi_aq_s3$expected, 1)
+
+#Education is significant but also heavily skewed towards a couple of education bins (p = 0.02)
+
+age_op_aq_s3 <-survey_3 %>%
+  dplyr::select(c(Opinion_aquaculture, Age_factor))
+age_op_aq_s3 <- age_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 2)
+age_op_aq_s3 <- age_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 4)
+age_op_aq_s3 <- age_op_aq_s3 %>%
+  dplyr::filter(Opinion_aquaculture != 7)
+table(age_op_aq_s3$Opinion_aquaculture)
+age_op_aq_s3_table <- table(age_op_aq_s3$Age_factor, age_op_aq_s3$Opinion_aquaculture)
+age_chi_aq_s3 <- chisq.test(age_op_aq_s3_table)
+expected_age_chi_aq_s3 <- round(age_chi_aq_s3$expected, 1)
+#Age is significant (p = 0.00735)
+
+```
+
+```{r, early analyses: ChiSquare on baseline familiarity by sociodemographic factors (SW survey only), include = FALSE}
+familiarity_data <- survey_3
+table(survey_3$Familiarity_seaweed)
+#test just never heard and have heard of
+familiarity_data$Familiarity_seaweed <- case_when(
+  familiarity_data$Familiarity_seaweed %% 4 == 0 ~ 2,
+  familiarity_data$Familiarity_seaweed %% 3 == 0 ~ 2,
+  familiarity_data$Familiarity_seaweed %% 2 == 0 ~ 2,
+  familiarity_data$Familiarity_seaweed %% 1 == 0 ~ 1)
+table(familiarity_data$Familiarity_seaweed)
+
+familiarity_data$Familiarity_aquaculture <- case_when(
+  familiarity_data$Familiarity_aquaculture %% 4 == 0 ~ 2,
+  familiarity_data$Familiarity_aquaculture %% 3 == 0 ~ 2,
+  familiarity_data$Familiarity_aquaculture %% 2 == 0 ~ 2,
+  familiarity_data$Familiarity_aquaculture %% 1 == 0 ~ 1)
+table(familiarity_data$Familiarity_aquaculture)
+
+region_familiarity_sw <- familiarity_data %>%
+  dplyr::select(c(Familiarity_seaweed, Region_factor))
+table(region_familiarity_sw$Familiarity_seaweed)
+
+region_familiarity_sw_table <- table(region_familiarity_sw$Region_factor, region_familiarity_sw$Familiarity_seaweed)
+region_chi_sw_fam <- chisq.test(region_familiarity_sw_table)
+#region is not significant
+
+race_familiarity_sw <- familiarity_data %>%
+  dplyr::select(c(Familiarity_seaweed, Race_factor))
+table(race_familiarity_sw$Familiarity_seaweed)
+race_familiarity_sw_table <- table(race_familiarity_sw$Race_factor, race_familiarity_sw$Familiarity_seaweed)
+race_chi_familiarity_sw <- chisq.test(race_familiarity_sw_table)
+#Race is not significant but also heavily skewed towards White population
+  
+edu_familiarity_sw <-familiarity_data %>%
+  dplyr::select(c(Familiarity_seaweed, Education_collapsed))
+table(edu_familiarity_sw$Familiarity_seaweed)
+edu_familiarity_sw_table <- table(edu_familiarity_sw$Education_collapsed, edu_familiarity_sw$Familiarity_seaweed)
+edu_chi_familiarity_sw <- chisq.test(edu_familiarity_sw_table)
+#Education is significant (p = 0.0001787).
+expected_familiarity_edu_sw <- round(edu_chi_familiarity_sw$expected, 1)
+
+age_familiarity_sw <-familiarity_data %>%
+  dplyr::select(c(Familiarity_seaweed, Age_factor))
+table(age_familiarity_sw$Familiarity_seaweed)
+age_familiarity_sw_table <- table(age_familiarity_sw$Age_factor, age_familiarity_sw$Familiarity_seaweed)
+age_chi_familiarity_sw <- chisq.test(age_familiarity_sw_table)
+#Age is not significant
+
+##Survey 3 familiarity marine aquaculture
+region_familiarity_aq <- familiarity_data %>%
+  dplyr::select(c(Familiarity_aquaculture, Region_factor))
+table(region_familiarity_aq$Familiarity_aquaculture)
+
+region_familiarity_aq_table <- table(region_familiarity_aq$Region_factor, region_familiarity_aq$Familiarity_aquaculture)
+region_chi_familiarity_aq <- chisq.test(region_familiarity_aq_table)
+#region is not significant
+
+race_familiarity_aq <- familiarity_data %>%
+  dplyr::select(c(Familiarity_aquaculture, Race_factor))
+
+table(race_familiarity_aq$Familiarity_aquaculture)
+race_familiarity_aq_table <- table(race_familiarity_aq$Race_factor, race_familiarity_aq$Familiarity_aquaculture)
+race_chi_familiarity_aq <- chisq.test(race_familiarity_aq_table)
+#Race is not significant but also heavily skewed towards White population
+  
+edu_familiarity_aq <-familiarity_data %>%
+  dplyr::select(c(Familiarity_aquaculture, Education_collapsed))
+
+table(edu_familiarity_aq$Familiarity_aquaculture)
+edu_familiarity_aq_table <- table(edu_familiarity_aq$Education_collapsed, edu_familiarity_aq$Familiarity_aquaculture)
+edu_chi_familiarity_aq <- chisq.test(edu_familiarity_aq_table)
+expected_chi_familiarity_aq <- round(edu_chi_familiarity_aq$expected, 1)
+#education is significant (p = 0.0054) but data is skewed towards specific bins
+
+age_familiarity_aq <-familiarity_data %>%
+  dplyr::select(c(Familiarity_aquaculture, Age_factor))
+table(age_familiarity_aq$Familiarity_aquaculture)
+age_familiarity_aq_table <- table(age_familiarity_aq$Age_factor, age_familiarity_aq$Familiarity_aquaculture)
+age_chi_familiarity_aq <- chisq.test(age_familiarity_aq_table)
+#Age is not significant
+
+```
+
+```{r, other k-w tests, include = FALSE}
+#Know little vs. somewhat familiar:
+aqua_kw_1 <- ma_ols_clean %>%
+  dplyr::filter(Familiarity_aq_factor != "Very familiar")
+kruskal.test(Opinion_aquaculture~Familiarity_aq_factor, data = aqua_kw_1)
+
+#Somewhat familiar vs. very familiar
+aqua_kw_2 <- ma_ols_clean %>%
+  dplyr::filter(Familiarity_aq_factor != "Heard of it but know little about it")
+kruskal.test(Opinion_aquaculture~Familiarity_aq_factor, data = aqua_kw_2)
+
+#Very familiar vs. know little
+aqua_kw_3 <- ma_ols_clean %>%
+  dplyr::filter(Familiarity_aq_factor != "Somewhat familiar")
+kruskal.test(Opinion_aquaculture~Familiarity_aq_factor, data = aqua_kw_3)
+
+#For seaweed
+#Know little vs. somewhat familiar:
+sw_kw_1 <- sw_ols_clean %>%
+  dplyr::filter(Familiarity_sw_factor != "Very familiar")
+kruskal.test(Opinion_seaweed~Familiarity_sw_factor, data = sw_kw_1)
+
+#Somewhat familiar vs. very familiar
+sw_kw_2 <- sw_ols_clean %>%
+  dplyr::filter(Familiarity_sw_factor != "Heard of it but know little about it")
+kruskal.test(Opinion_seaweed~Familiarity_sw_factor, data = sw_kw_2)
+
+#Very familiar vs. know little
+sw_kw_3 <- sw_ols_clean %>%
+  dplyr::filter(Familiarity_sw_factor != "Somewhat familiar")
+kruskal.test(Opinion_seaweed~Familiarity_sw_factor, data = sw_kw_3)
+
+```
+
+##Pre-Post video opinions
+```{r, Wilcoxon for survey 2 on videos seperated out}
+video_1 <- s2_wilcox_data %>%
+  dplyr::filter(video_factor == "Mussels No Food")
+
+video_2 <-s2_wilcox_data %>%
+  dplyr::filter(video_factor == "Mussels Food Only")
+  
+video_3 <-s2_wilcox_data %>%
+  dplyr::filter(video_factor == "Standard Intro")
+
+video_4 <-s2_wilcox_data %>%
+  dplyr::filter(video_factor == "Standard Closing")
+
+video_5 <-s2_wilcox_data %>%
+  dplyr::filter(video_factor == "Kanpachi No Food")
+
+video_6 <-s2_wilcox_data %>%
+  dplyr::filter(video_factor == "Kanpachi Food Only")
+
+str(video_1)
+
+test_1 <- video_1 %>%
+  wilcox_test(Opinion ~ video, paired = TRUE)
+eff_1 <- video_1 %>%
+wilcox_effsize(Opinion ~ video, paired = TRUE)
+
+test_2 <- video_2 %>%
+  wilcox_test(Opinion ~ video, paired = TRUE)
+eff_2 <- video_2 %>%
+  wilcox_effsize(Opinion ~ video, paired = TRUE)
+
+test_3 <- video_3 %>%
+  wilcox_test(Opinion ~ video, paired = TRUE)
+eff_3 <- video_3%>%
+  wilcox_effsize(Opinion ~ video, paired = TRUE)
+
+test_4 <- video_4 %>%
+  wilcox_test(Opinion ~ video, paired = TRUE)
+eff_4 <- video_4 %>%
+  wilcox_effsize(Opinion ~ video, paired = TRUE)
+
+test_5 <- video_5 %>%
+  wilcox_test(Opinion ~ video, paired = TRUE)
+eff_5 <- video_5 %>%
+  wilcox_effsize(Opinion ~ video, paired = TRUE)
+
+test_6 <- video_6 %>%
+  wilcox_test(Opinion ~ video, paired = TRUE)
+eff_6 <- video_6 %>%
+  wilcox_effsize(Opinion ~ video, paired = TRUE)
+
+#calculate averages for each
+opinion_sum <- s2_wilcox_data %>%
+  group_by(video_factor, video) %>%
+  summarise(avg = sum(Opinion/length(Opinion)))
+
+
+
+```
+
+```{r, Opinion post with opinion pre as predictor}
+#Opinion post-video by their pre-video opinions
+post_by_pre_sw <- survey_3 %>%
+  dplyr::select(Opinion_seaweed, Opinion_seaweed_post)
+
+#Keep each pre-opinion level as a categorical predictor in the regression, but remove "not sure" post-opinion (n = 15)
+table(post_by_pre_sw$Opinion_seaweed_post)
+post_by_pre_sw <- post_by_pre_sw %>%
+  dplyr::filter(Opinion_seaweed_post != 4) #final n = 846
+
+post_by_pre_aq <- survey_2 %>%
+  dplyr::select(Opinion_aqua_pre, Opinion_aqua_post)
+table(post_by_pre_aq$Opinion_aqua_post) #n here for not sure is 2. Also remove.
+post_by_pre_aq <- post_by_pre_aq %>%
+  dplyr::filter(Opinion_aqua_post != 4)
+
+#need complete responses to properly analyze
+post_by_pre_sw <- mutate_all(post_by_pre_sw, na_if, '#NULL!')
+post_by_pre_sw <- post_by_pre_sw[complete.cases(post_by_pre_sw),]
+#final n is 846
+
+post_by_pre_aq <- mutate_all(post_by_pre_aq, na_if, '#NULL!')
+post_by_pre_aq <- post_by_pre_aq[complete.cases(post_by_pre_aq),]
+#final n is 151
+
+#Post-opinion an ordered 3-level factor (not sure removed) with consistent groupings from other analyses.
+table(post_by_pre_sw$Opinion_seaweed_post)
+post_by_pre_sw$Opinion_seaweed_post = as.numeric(post_by_pre_sw$Opinion_seaweed_post)
+
+table(post_by_pre_aq$Opinion_aqua_post)
+post_by_pre_aq$Opinion_aqua_post = as.numeric(post_by_pre_aq$Opinion_aqua_post)
+
+post_by_pre_sw$Opinion_seaweed_post = factor(post_by_pre_sw$Opinion_seaweed_post,
+                    ordered = TRUE,
+                    levels = c("1", "2", "3"))
+
+post_by_pre_aq$Opinion_aqua_post = factor(post_by_pre_aq$Opinion_aqua_post,
+                    ordered = TRUE,
+                    levels = c("1", "2", "3"))
+
+#pre-opinion a categorical predictor with 5 levels for SW survey and 4 levels for MA survey (MA survey did not have 'never heard of it' as an option)
+table(post_by_pre_sw$Opinion_seaweed)
+post_by_pre_sw$Opinion_seaweed = as.numeric(post_by_pre_sw$Opinion_seaweed)
+post_by_pre_sw$Opinion_seaweed <- case_when(
+  post_by_pre_sw$Opinion_seaweed %% 7 == 0 ~ "Never heard",
+  post_by_pre_sw$Opinion_seaweed %% 4 == 0 ~ "Not sure",
+  post_by_pre_sw$Opinion_seaweed %% 3 == 0 ~ "Favorable",
+  post_by_pre_sw$Opinion_seaweed %% 2 == 0 ~ "Neutral",
+  post_by_pre_sw$Opinion_seaweed %% 1 == 0 ~ "Unfavorable")
+post_by_pre_sw$Opinion_seaweed=as.factor(post_by_pre_sw$Opinion_seaweed)
+str(post_by_pre_sw)
+
+table(post_by_pre_aq$Opinion_aqua_pre)
+post_by_pre_aq$Opinion_aqua_pre = as.numeric(post_by_pre_aq$Opinion_aqua_pre)
+post_by_pre_aq$Opinion_aqua_pre <- case_when(
+  post_by_pre_aq$Opinion_aqua_pre %% 4 == 0 ~ "Not sure",
+  post_by_pre_aq$Opinion_aqua_pre %% 3 == 0 ~ "Favorable",
+  post_by_pre_aq$Opinion_aqua_pre %% 2 == 0 ~ "Neutral",
+  post_by_pre_aq$Opinion_aqua_pre %% 1 == 0 ~ "Unfavorable")
+post_by_pre_aq$Opinion_aqua_pre=as.factor(post_by_pre_aq$Opinion_aqua_pre)
+str(post_by_pre_aq)
+
+#test using the polr function
+post_pre_test_sw <- polr(Opinion_seaweed_post ~ Opinion_seaweed, data = post_by_pre_sw)
+summary(post_pre_test_sw) 
+#Test Assumptions
+brant(post_pre_test_sw) #parallel regression assumption does not hold. Confirm findings with K-W tests (below)
+#Query the model
+Anova(post_pre_test_sw) #tested by familiarity level, region, education, not significant.
+#get coefficients and odds ratios
+coefs_sw <- coef(post_pre_test_sw)
+ci_sw <- confint(post_pre_test_sw)
+exp(cbind(OR = coef(post_pre_test_sw), ci_sw))
+emmeans(post_pre_test_sw, list(pairwise ~ Opinion_seaweed))
+
+
+post_pre_test_aq <- polr(Opinion_aqua_post ~ Opinion_aqua_pre, data = post_by_pre_aq)
+summary(post_pre_test_aq) 
+#Test Assumptions
+brant(post_pre_test_aq) #parallel regression assumption does not hold
+#Query the model
+Anova(post_pre_test_aq) 
+
+coefs_aq <- coef(post_pre_test_aq)
+ci_aq <- confint(post_pre_test_aq)
+exp(cbind(OR = coef(post_pre_test_aq), ci_aq))
+emmeans(post_pre_test_aq, list(pairwise ~ Opinion_aqua_pre))
+#Wald test for overall effect - only works on clm data
+clm_sw = clm(Opinion_seaweed_post ~ Opinion_seaweed, data = post_by_pre_sw, link = "logit") 
+clm_aq = clm(Opinion_aqua_post ~ Opinion_aqua_pre, data = post_by_pre_aq, link = "logit")
+wald.test(b = coef(clm_sw), Sigma = vcov(clm_sw), Terms = 2:4)
+wald.test(b = coef(clm_aq), Sigma = vcov(clm_aq), Terms = 2:4)
+```
+
+##Testing if significant differences in pre-opinion carry over to pos-opinion
+```{r, Ordered regressions and Kruskal-Wallace tests on post-opinion with socioeconomic predictors (SW survey and MA survey), echo = FALSE}
+
+####Seaweed farming####
+ 
+#pull necessary columns. 
+sw_socio_post <- survey_3 %>%
+  select(Opinion_seaweed_post, Education_collapsed, Age_factor, Region_factor, Race_factor)
+
+#remove incomplete responses 
+sw_socio_post <- mutate_all(sw_socio_post, na_if, '#NULL!')
+sw_socio_post <- sw_socio_post[complete.cases(sw_socio_post),] #(n = 4)
+
+#Pull 'Never heard of it' and "not sure" from dataset (analyzed seperately) to be able to analyze baseline opinion by baseline familiarity and sociodemographics with an ordered regression. 
+table(sw_socio_post$Opinion_seaweed_post)
+
+sw_socio_post <- sw_socio_post %>%
+  dplyr::filter(Opinion_seaweed_post != "4") #final n is 846
+
+#Baseline opinion of seaweed farming by familiarity level
+sw_socio_post$Opinion_seaweed_post = factor(sw_socio_post$Opinion_seaweed_post,
+                                          ordered = TRUE,
+                                          levels = c("1", "2", "3"))
+str(sw_socio_post)
+sw_socio_post$Education_collapsed = as.factor(sw_socio_post$Education_collapsed)
+sw_socio_post$Age_factor = as.factor(sw_socio_post$Age_factor)
+sw_socio_post$Region_factor = as.factor(sw_socio_post$Region_factor)
+sw_socio_post$Race_factor = as.factor(sw_socio_post$Race_factor)
+
+####Sociodemographic variables####
+#Ordered logistic regressions on each variable 
+
+edu_post_sw_polr = polr(Opinion_seaweed_post ~ Education_collapsed, data = sw_socio_post, Hess = TRUE)
+summary(edu_post_sw_polr)
+#Test Assumptions
+brant(edu_post_sw_polr)  #parallel regression assumption does not hold
+Anova(edu_post_sw_polr) #significant difference
+
+age_post_sw_polr = polr(Opinion_seaweed_post ~ Age_factor, data = sw_socio_post, Hess = TRUE)
+summary(age_post_sw_polr)
+#Test Assumptions
+brant(age_post_sw_polr)  #parallel regression assumption does not hold for age. See Kruskal-Wallis tests below for confirmation.
+Anova(age_post_sw_polr) #no significant difference
+
+region_post_sw_polr = polr(Opinion_seaweed_post ~ Region_factor, data = sw_socio_post, Hess = TRUE)
+summary(region_post_sw_polr)
+#Test Assumptions
+brant(region_post_sw_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(region_post_sw_polr) #no significant difference
+
+race_post_sw_polr = polr(Opinion_seaweed_post ~ Race_factor, data = sw_socio_post, Hess = TRUE)
+summary(race_post_sw_polr)
+#Test Assumptions
+brant(race_post_sw_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(race_post_sw_polr) #no significant difference
+
+####Kruskal-Wallis Tests####
+#Kruskal-Wallis rank sum tests on variables that did not meet the parallel regression assumption
+
+sw_post_ed_kw <- kruskal.test(Opinion_seaweed_post ~ Education_collapsed, data = sw_socio_post)
+
+sw_post_age_kw <- kruskal.test(Opinion_seaweed_post ~ Age_factor, data = sw_socio_post)
+
+sw_post_region_kw <- kruskal.test(Opinion_seaweed_post ~ Region_factor, data = sw_socio_post)
+
+sw_post_race_kw <- kruskal.test(Opinion_seaweed_post ~ Race_factor, data = sw_socio_post)
+
+#K-W contrasts on significant variables using Dunn's test as a post-hoc test and the Bejamini-Hochberg FDR method for multiple hypothesis testing at a 5% cutoff.
+
+library(FSA)
+sw_socio_post$Opinion_seaweed_post = as.numeric(sw_socio_post$Opinion_seaweed_post)
+
+sw_post_ed_contrasts <- dunnTest(Opinion_seaweed_post ~ Education_collapsed, data = sw_socio_post, method = "bh")
+
+```
+
+##Analyses using all 5 opinion levels
+
+###We did not find differences in the results of these tests and determined we should use the three levels where appropriate for ease of interpretation.
+```{r, Ordered regressions and Kruskal-Wallace tests on ALL levels of baseline opinions with familiarity and sociodemographics predictors (SW survey only), echo = FALSE}
+
+####Seaweed farming####
+ 
+#pull necessary columns. 
+sw_ols_all <- survey_3 %>%
+  select(Opinion_sw_pre_all, Familiarity_sw_factor, Education_collapsed, Age_factor, Region_factor, Race_factor)
+
+ma_ols_all <- survey_3 %>%
+  select(Opinion_aq_all, Familiarity_aq_factor, Education_collapsed, Age_factor, Region_factor, Race_factor)
+
+#remove incomplete responses 
+sw_ols_all <- mutate_all(sw_ols_all, na_if, '#NULL!')
+sw_ols_all <- sw_ols_all[complete.cases(sw_ols_all),] #(n = 4)
+
+ma_ols_all <- mutate_all(ma_ols_all, na_if, '#NULL!')
+ma_ols_all <- ma_ols_all[complete.cases(ma_ols_all),] #(n = 0)
+
+#Pull 'Never heard of it' and "not sure" from dataset (analyzed seperately) to be able to analyze baseline opinion by baseline familiarity and sociodemographics with an ordered regression. 
+table(sw_ols_all$Opinion_sw_pre_all)
+table(ma_ols_all$Opinion_aq_all)
+
+#for all data
+sw_ols_clean <- sw_ols_all %>%
+  dplyr::filter(Opinion_sw_pre_all != "7") 
+sw_ols_clean <- sw_ols_clean %>%
+  dplyr::filter(Opinion_sw_pre_all != "6") #final n is 592
+
+ma_ols_clean <- ma_ols_all %>%
+  dplyr::filter(Opinion_aq_all != "7")
+ma_ols_clean <- ma_ols_clean %>%
+  dplyr::filter(Opinion_aq_all != "6") #final n is 690
+
+#double check that there are no lingering "never heard of it" responses in the familiarity column.
+table(sw_ols_clean$Opinion_sw_pre_all)
+table(ma_ols_clean$Opinion_aq_all)
+table(sw_ols_clean$Familiarity_sw_factor)
+table(ma_ols_clean$Familiarity_aq_factor)
+
+#Baseline opinion of seaweed farming by familiarity level
+sw_ols_clean$Opinion_sw_pre_all = factor(sw_ols_clean$Opinion_sw_pre_all,
+                                          ordered = TRUE,
+                                          levels = c("1", "2", "3", "4", "5"))
+sw_ols_clean$Familiarity_sw_factor = as.factor(sw_ols_clean$Familiarity_sw_factor)
+str(sw_ols_clean)
+sw_ols_clean$Education_collapsed = as.factor(sw_ols_clean$Education_collapsed)
+sw_ols_clean$Age_factor = as.factor(sw_ols_clean$Age_factor)
+sw_ols_clean$Region_factor = as.factor(sw_ols_clean$Region_factor)
+sw_ols_clean$Race_factor = as.factor(sw_ols_clean$Race_factor)
+
+sw_ols_clean$Familiarity_sw_factor <- fct_relevel(sw_ols_clean$Familiarity_sw_factor, c("Very familiar", "Somewhat familiar", "Heard of it but know little about it"))
+
+#Ordered logistic regressions on each variable 
+ols1_sw_polr = polr(Opinion_sw_pre_all ~ Familiarity_sw_factor, data = sw_ols_clean, Hess = TRUE)
+summary(ols1_sw_polr)
+#Test Assumptions
+brant(ols1_sw_polr)  #parallel regression assumption holds
+Anova(ols1_sw_polr) #significant difference across familiarity groups.
+#Odds ratios for familiarity
+ci_sw <- confint(ols1_sw_polr)
+exp(cbind(OR = coef(ols1_sw_polr), ci_sw))
+
+#p-values
+ctable_sw <- coef(summary(ols1_sw_polr))
+p <- pnorm(abs(ctable_sw[, "t value"]), lower.tail = FALSE) * 2
+ctable <- cbind(ctable_sw, "p value" = p)
+
+#contrasts
+emmeans(ols1_sw_polr, list(pairwise ~ Familiarity_sw_factor))
+em_sw_familiarity <- emmeans(ols1_sw_polr, ~Familiarity_sw_factor, type = "response") 
+pairs_sw_familiarity <-pairs(em_sw_familiarity, adjust = "fdr") #use this method for p-value adjustment
+#predicted probabilities
+familiarity_sw_clm = clm(Opinion_sw_pre_all ~ Familiarity_sw_factor, data = sw_ols_clean, Hess = TRUE)
+sw_predictions = ggpredict(familiarity_sw_clm, terms = c("Familiarity_sw_factor"))
+
+#test with education
+familiarity_sw_polr = polr(Opinion_sw_pre_all ~ Familiarity_sw_factor + Education_collapsed, data = sw_ols_clean, Hess = TRUE)
+summary(familiarity_sw_polr)
+#Test Assumptions
+brant(familiarity_sw_polr)  #parallel regression assumption does not hold for education levels but does hold for familiarity. The AIC isn't any better with multivariate or univariate.
+Anova(familiarity_sw_polr) #significant difference for familiarity not education. See Kruskal-Wallis tests below for confirmation.
+
+####Sociodemographic variables####
+age_sw_polr = polr(Opinion_sw_pre_all ~ Age_factor, data = sw_ols_clean, Hess = TRUE)
+summary(age_sw_polr)
+#Test Assumptions
+brant(age_sw_polr)  #parallel regression assumption does not hold for age. See Kruskal-Wallis tests below for confirmation.
+Anova(age_sw_polr) #significant difference
+
+region_sw_polr = polr(Opinion_sw_pre_all ~ Region_factor, data = sw_ols_clean, Hess = TRUE)
+summary(region_sw_polr)
+#Test Assumptions
+brant(region_sw_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(region_sw_polr) #no significant difference
+
+race_sw_polr = polr(Opinion_sw_pre_all ~ Race_factor, data = sw_ols_clean, Hess = TRUE)
+summary(race_sw_polr)
+#Test Assumptions
+brant(race_sw_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(race_sw_polr) #no significant difference
+
+####Marine Aquaculture####
+ma_ols_clean$Opinion_aq_all = factor(ma_ols_clean$Opinion_aq_all,
+                                          ordered = TRUE,
+                                          levels = c("1", "2", "3", "4", "5"))
+ma_ols_clean$Familiarity_aq_factor = as.factor(ma_ols_clean$Familiarity_aq_factor)
+ma_ols_clean$Familiarity_aq_factor <- fct_relevel(ma_ols_clean$Familiarity_aq_factor, c("Very familiar", "Somewhat familiar", "Heard of it but know little about it"))
+str(ma_ols_clean)
+ma_ols_clean$Education_collapsed = as.factor(ma_ols_clean$Education_collapsed)
+ma_ols_clean$Age_factor = as.factor(ma_ols_clean$Age_factor)
+ma_ols_clean$Region_factor = as.factor(ma_ols_clean$Region_factor)
+ma_ols_clean$Race_factor = as.factor(ma_ols_clean$Race_factor)
+
+familiarity_ma_polr = polr(Opinion_aq_all ~ Familiarity_aq_factor, data = ma_ols_clean, Hess = TRUE)
+summary(familiarity_ma_polr)
+#Test Assumptions
+brant(familiarity_ma_polr)  #parallel regression assumption holds
+Anova(familiarity_ma_polr) #significant difference
+
+#Odds ratios for familiarity
+ci_ma1 <- confint(familiarity_ma_polr)
+exp(cbind(OR = coef(familiarity_ma_polr), ci_ma1))
+
+#p-values
+ctable_ma <- coef(summary(familiarity_ma_polr))
+p <- pnorm(abs(ctable_ma[, "t value"]), lower.tail = FALSE) * 2
+ctable_ma <- cbind(ctable_ma, "p value" = p)
+
+#contrasts
+em_aq <- emmeans(familiarity_ma_polr, ~Familiarity_aq_factor, type = "response") 
+pairs_aq <-pairs(em_aq, adjust = "fdr")
+
+#predicted probabilities
+familiarity_ma_clm = clm(Opinion_aq_all ~ Familiarity_aq_factor, data = ma_ols_clean, Hess = TRUE)
+ma_predictions = ggpredict(familiarity_ma_clm, terms = c("Familiarity_aq_factor"))
+
+####Sociodemographic variables####
+education_ma_polr = polr(Opinion_aq_all ~ Education_collapsed, data = ma_ols_clean, Hess = TRUE)
+summary(education_ma_polr)
+#Test Assumptions
+brant(education_ma_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(education_ma_polr) #significant difference for education
+
+age_ma_polr = polr(Opinion_aq_all ~ Age_factor, data = ma_ols_clean, Hess = TRUE)
+summary(age_ma_polr)
+#Test Assumptions
+brant(age_ma_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(age_ma_polr) #significant difference
+
+region_ma_polr = polr(Opinion_aq_all ~ Region_factor, data = ma_ols_clean, Hess = TRUE)
+summary(region_ma_polr)
+#Test Assumptions
+brant(region_ma_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(region_ma_polr) #no significant difference
+
+race_ma_polr = polr(Opinion_aq_all ~ Race_factor, data = ma_ols_clean, Hess = TRUE)
+summary(race_ma_polr)
+#Test Assumptions
+brant(race_ma_polr)  #parallel regression assumption does not hold. See Kruskal-Wallis tests below for confirmation.
+Anova(race_ma_polr) #no significant difference
+
+####Kruskal-Wallis Tests####
+#Kruskal-Wallis rank sum tests on variables that did not meet the parallel regression assumption
+aqua_ed_kw <- kruskal.test(Opinion_aq_all ~ Education_collapsed, data = ma_ols_clean)
+
+aqua_age_kw <- kruskal.test(Opinion_aq_all ~ Age_factor, data = ma_ols_clean)
+
+aqua_region_kw <- kruskal.test(Opinion_aq_all ~ Region_factor, data = ma_ols_clean)
+
+aqua_race_kw <- kruskal.test(Opinion_aq_all ~ Race_factor, data = ma_ols_clean)
+
+sw_ed_kw <- kruskal.test(Opinion_sw_pre_all ~ Education_collapsed, data = sw_ols_clean)
+
+sw_age_kw <- kruskal.test(Opinion_sw_pre_all ~ Age_factor, data = sw_ols_clean)
+
+sw_region_kw <- kruskal.test(Opinion_sw_pre_all ~ Region_factor, data = sw_ols_clean)
+
+sw_race_kw <- kruskal.test(Opinion_sw_pre_all ~ Race_factor, data = sw_ols_clean)
+
+#K-W contrasts on significant variables using Dunn's test as a post-hoc test and the Bejamini-Hochberg FDR method for multiple hypothesis testing at a 5% cutoff.
+
+library(FSA)
+ma_ols_clean$Opinion_aquaculture = as.numeric(ma_ols_clean$Opinion_aquaculture)
+sw_ols_clean$Opinion_seaweed = as.numeric(sw_ols_clean$Opinion_seaweed)
+
+aqua_ed_contrasts <- dunnTest( Opinion_aquaculture ~ Education_collapsed, data = ma_ols_clean, method = "bh")
+
+aqua_age_contrasts <- dunnTest( Opinion_aquaculture ~ Age_factor, data = ma_ols_clean, method = "bh")
+
+sw_ed_contrasts <- dunnTest( Opinion_seaweed ~ Education_collapsed, data = sw_ols_clean, method = "bh")
+
+```
+
+```{r, ChiSq tests on baseline opinion by familiarity, include = FALSE}
+
+table(survey_3$Familiarity_seaweed)
+#remove the 'never heard of it' group (level 1)
+seaweed_chisq <- survey_3 %>%
+  dplyr::filter(Familiarity_seaweed != 1)
+table(seaweed_chisq$Familiarity_seaweed)
+table(seaweed_chisq$Opinion_seaweed)
+#two respondants selected 7 (never heard of it) in their opinion response. Remove those as outliers.
+seaweed_chisq <- seaweed_chisq %>%
+  dplyr::filter(Opinion_seaweed != 7)
+
+#test contingency table
+sw_chisq_data <- table(seaweed_chisq$Familiarity_sw_factor, seaweed_chisq$Opinion_seaweed) # 1 = unfavorable, 2 = neutral, 3 = favorable, 4 = not sure
+chisq_sw <- chisq.test(sw_chisq_data)
+expected_sw <- round(chisq_sw$expected, 1)
+contrasts <- pairwise.prop.test(chisq_sw)
+
+#ChiSquare to match reporting in the paper where not sure and neutral are collapsed into one column.
+know_little_sw <- c(24, 204, 99)
+very_somewhat_sw <- c(24, 56, 240)
+table_sw_2 <- as.matrix(rbind(know_little_sw, very_somewhat_sw))
+chisq_2 <- chisq.test(table_sw_2)
+chisq_2_exp <- round(chisq_2$expected, 1)
+
+#same process for opinion of marine aquaculture and familiarity
+aquaculture_chisq_data <- survey_3 %>%
+  dplyr::filter(Familiarity_aq_factor != 'Never heard of it')
+table(aquaculture_chisq_data$Opinion_aquaculture)
+
+#one respondent selected 7 (never heard of it) in their opinion response. Remove as an outlier.
+aquaculture_chisq_data <- aquaculture_chisq_data %>%
+  dplyr::filter(Opinion_aquaculture != 7)
+
+#ChiSq on full dataset
+aq_chisq_table_2 <- table(aquaculture_chisq_data$Familiarity_aq_factor, aquaculture_chisq_data$Opinion_aquaculture)
+chisq_aq_2 <- chisq.test(aq_chisq_table_2)
+expected_aq_2 <- round(chisq_aq_2$expected, 1)
+
+#ChiSquare to match reporting in the paper where neutral and not sure are collapsed into one column.
+know_little_aq <- c(31, 194, 105)
+very_somewhat_aq <- c(66, 116, 248)
+table_aq_2 <- as.matrix(rbind(know_little_aq, very_somewhat_aq))
+chisq_aq_paper <- chisq.test(table_aq_2)
+chisq_2_exp_paper <- round(chisq_aq_paper$expected, 1)
+
+#Extra comparison: familiarity with marine aquaculture and seaweed farming
+table(survey_3$Familiarity_aq_factor)
+
+#create a contingency table
+fam_aq <- c(104, 330, 314, 116)
+fam_sw <- c(212, 329, 222, 98)
+fam <- c("never", "little", "somewhat", "very")
+table_fam <- as.matrix(rbind(fam_aq, fam_sw))
+fam_chisq <- chisq.test(table_fam)
+expected_fam <- round(fam_chisq$expected, 1)
+```
+
+```{r, Chisq tests on if not sure group had different sociodemographic makeups (MA survey only), echo = FALSE}
+
+ma_group_all_s1 <- survey_2 %>%
+  select(Opinion_aqua_pre, Education_collapsed, Race_factor, Age, Region_factor)
+
+ma_group_all_s1 <- mutate_all(ma_group_all_s1, na_if, '#NULL!')
+ma_group_all_s1 <- ma_group_all_s1[complete.cases(ma_group_all_s1),] #(n = 2 final n = 152)
+
+#Create three categories with dummy variables: 1 = never heard group, 2 = not sure group, 3 = all others 
+
+ma_group_all_s1$Opinion_aqua_pre = as.numeric(ma_group_all_s1$Opinion_aqua_pre)
+table(ma_group_all_s1$Opinion_aqua_pre)
+ma_group_all_s1$Opinion_aqua_pre <- case_when(
+  ma_group_all_s1$Opinion_aqua_pre %% 4 == 0 ~ 2,
+  ma_group_all_s1$Opinion_aqua_pre %% 3 == 0 ~ 1,
+  ma_group_all_s1$Opinion_aqua_pre %% 2 == 0 ~ 1,
+  ma_group_all_s1$Opinion_aqua_pre %% 1 == 0 ~ 1)
+
+table(ma_group_all_s1$Opinion_aqua_pre)
+
+
+####Kruskal-Wallis####
+#Kruskal-Wallis rank sum tests on variables that did not meet the parallel regression assumption
+aqua_ed_groups_s1 <- kruskal.test(Opinion_aqua_pre ~ Education_collapsed, data = ma_group_all_s1) #not significant
+
+aqua_age_groups_s1 <- kruskal.test(Opinion_aqua_pre ~ Age, data = ma_group_all_s1) #not significant
+
+aqua_region_groups_s1 <- kruskal.test(Opinion_aqua_pre ~ Region_factor, data = ma_group_all_s1) #not significant
+
+aqua_race_groups_s1 <- kruskal.test(Opinion_aqua_pre ~ Race_factor, data = ma_group_all_s1) #not significant
+
+####ChiSq tests since there's only two groups####
+
+chi_aq_ed <- ma_group_all_s1 %>%
+  select(Opinion_aqua_pre, Education_collapsed)
+chi_aq_ed <- as.matrix(chi_aq_ed)
+chisq.test(chi_aq_ed) #not significant
+
+chi_aq_age <-ma_group_all_s1 %>%
+  select(Opinion_aqua_pre, Age_factor)
+chi_aq_age <- as.matrix(chi_aq_age)
+chisq.test(chi_aq_age) #not significant
+  
+chi_aq_race <-survey_2 %>%
+  select(Opinion_aqua_pre, Race)
+table(chi_aq_race$Opinion_aqua_pre)
+chi_aq_race$Opinion_aqua_pre <- case_when(
+  chi_aq_race$Opinion_aqua_pre %% 4 == 0 ~ 2,
+  chi_aq_race$Opinion_aqua_pre %% 3 == 0 ~ 1,
+  chi_aq_race$Opinion_aqua_pre %% 2 == 0 ~ 1,
+  chi_aq_race$Opinion_aqua_pre %% 1 == 0 ~ 1)
+
+str(chi_aq_race)
+#remove null
+chi_aq_race <- mutate_all(chi_aq_race, na_if, '#NULL!')
+chi_aq_race <- chi_aq_race[complete.cases(chi_aq_race),] 
+str(chi_aq_race)
+chi_aq_race$Race = as.numeric(chi_aq_race$Race)
+chi_aq_race <- as.matrix(chi_aq_race)
+chisq.test(chi_aq_race) #not significant
+  
+chi_aq_region <-survey_2 %>%
+  select(Opinion_aqua_pre, Region)
+table(chi_aq_region$Opinion_aqua_pre)
+chi_aq_region$Opinion_aqua_pre <- case_when(
+  chi_aq_region$Opinion_aqua_pre %% 4 == 0 ~ 2,
+  chi_aq_region$Opinion_aqua_pre %% 3 == 0 ~ 1,
+  chi_aq_region$Opinion_aqua_pre %% 2 == 0 ~ 1,
+  chi_aq_region$Opinion_aqua_pre %% 1 == 0 ~ 1)
+
+#remove null
+str(chi_aq_region)
+chi_aq_region <- mutate_all(chi_aq_region, na_if, '#NULL!')
+chi_aq_region <- chi_aq_region[complete.cases(chi_aq_region),] 
+chi_aq_region <- as.matrix(chi_aq_region)
+chisq.test(chi_aq_region) #not significant
+
+```
