@@ -11,8 +11,11 @@ library(tidyverse)
 library(tigris)
 library(zipcodeR)
 library(sf)
+library(MASS)
 
 setwd(here::here())
+
+theme_set(theme_minimal())
 
 
 data <- read_csv("data/Data.csv") |>
@@ -164,33 +167,112 @@ data$age_range <- cut(data$age, breaks = rounded_breaks, labels = labels, includ
 
 ```{r}
 #Ordered logistic regressions on each variable 
-wood_age = polr(factor(Wood) ~ age_range, data = data, Hess = TRUE)
+wood_age <- polr(factor(Wood) ~ age_range, data = data, Hess = TRUE)
 summary(wood_age)
 #Test Assumptions
 brant(wood_age)  #parallel regression assumption holds
 Anova(wood_age) # SIGNIFICANT
 
-#Ordered logistic regressions on each variable 
-climate = polr(factor(Climate_Protection) ~ age_range, data = data, Hess = TRUE)
-summary(climate)
-#Test Assumptions
-brant(climate)  #parallel regression assumption holds
-Anova(climate) # not significant
+# Compute predicted probabilities
+pp <- ggpredict(wood_age, terms = "age_range")
 
-#Ordered logistic regressions on each variable 
-bio = polr(factor(Biodiversity) ~ age_range, data = data, Hess = TRUE)
-summary(bio)
-#Test Assumptions
-brant(bio)  #parallel regression assumption holds
-Anova(bio) # not significant
+# Plot
+ggplot(pp[c(3,6,9,12),], aes(x = x, y = predicted, group = group)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Age Range", y = "Predicted Probability") +
+  geom_line(data = pp[c(1,4,8,11),], aes(x = x, y = predicted, group = group), color = "blue") +
+  geom_line(data = pp[c(2,5,7,10),], aes(x = x, y = predicted, group = group), color = "red") 
+  
+```
+
+```{r}
+# Data for Response Level 1 (Not Important)
+data_1 <- data.frame(
+  age_range = c("18-48", "49-57", "58-64", "65-87"),
+  predicted = c(0.34, 0.38, 0.20, 0.21),
+  ci_lower = c(0.34, 0.23, 0.11, 0.12),
+  ci_upper = c(0.34, 0.55, 0.33, 0.34)
+)
+
+# Data for Response Level 2 (Somewhat Important)
+data_2 <- data.frame(
+  age_range = c("18-48", "49-57", "58-64", "65-87"),
+  predicted = c(0.45, 0.44, 0.45, 0.45),
+  ci_lower = c(0.45, 0.28, 0.29, 0.29),
+  ci_upper = c(0.45, 0.61, 0.62, 0.62)
+)
+
+# Data for Response Level 3 (Very Important)
+data_3 <- data.frame(
+  age_range = c("18-48", "49-57", "58-64", "65-87"),
+  predicted = c(0.21, 0.18, 0.36, 0.34),
+  ci_lower = c(0.21, 0.10, 0.22, 0.21),
+  ci_upper = c(0.21, 0.31, 0.53, 0.51)
+)
+# Add a column for response level
+data_1$response_level <- "Not Important"
+data_2$response_level <- "Somewhat Important"
+data_3$response_level <- "Very Important"
+
+# Combine the data frames
+combined_data <- rbind(data_1, data_2, data_3)
+
+ggplot(combined_data, aes(x = age_range, group = response_level)) +
+  geom_line(aes(y = predicted), size = 1.5) +
+  geom_line(aes(y = ci_upper)) +
+  geom_line(aes(y = ci_lower)) +
+  facet_wrap(~ response_level) +
+  labs(title = "Age")
+
+```
+
+```{r}
+# Data for Response Level 1 (Not Important)
+data_1 <- data.frame(
+  politics = c("Slightly Liberal", "Liberal", "Moderate", "Slightly Conservative", "Conservative"),
+  predicted = c(0.10, 0.05, 0.13, 0.13, 0.16),
+  ci_lower = c(0.04, 0.05, 0.07, 0.06, 0.07),
+  ci_upper = c(0.22, 0.05, 0.23, 0.27, 0.33)
+)
+
+# Data for Response Level 2 (Somewhat Important)
+data_2 <- data.frame(
+  politics = c("Slightly Liberal", "Liberal", "Moderate", "Slightly Conservative", "Conservative"),
+  predicted = c(0.35, 0.23, 0.39, 0.39, 0.42),
+  ci_lower = c(0.18, 0.23, 0.24, 0.20, 0.23),
+  ci_upper = c(0.57, 0.23, 0.56, 0.62, 0.65)
+)
+
+# Data for Response Level 3 (Very Important)
+data_3 <- data.frame(
+  politics = c("Slightly Liberal", "Liberal", "Moderate", "Slightly Conservative", "Conservative"),
+  predicted = c(0.55, 0.72, 0.48, 0.48, 0.41),
+  ci_lower = c(0.33, 0.72, 0.31, 0.26, 0.22),
+  ci_upper = c(0.75, 0.72, 0.65, 0.70, 0.64)
+)
+
+# Add a column for response level
+data_1$response_level <- "Not Important"
+data_2$response_level <- "Somewhat Important"
+data_3$response_level <- "Very Important"
+
+# Combine the data frames
+combined_data <- rbind(data_1, data_2, data_3) |>
+  mutate(politics = factor(politics,
+                           levels = c("Slightly Liberal",
+                                      "Liberal",
+                                      "Moderate",
+                                      "Slightly Conservative",
+                                      "Conservative")))
 
 
-#Ordered logistic regressions on each variable 
-fall = polr(factor(Fall_Foliage) ~ age_range, data = data, Hess = TRUE)
-summary(fall)
-#Test Assumptions
-brant(fall)  #parallel regression assumption holds
-Anova(fall) # not significant
+ggplot(combined_data, aes(x = politics, group = response_level)) +
+  geom_line(aes(y = predicted), size = 1.5) +
+  geom_line(aes(y = ci_upper)) +
+  geom_line(aes(y = ci_lower)) +
+  facet_wrap(~ response_level) +
+  labs(title = "Politics")
 ```
 
 ## Politics

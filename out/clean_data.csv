@@ -1,0 +1,242 @@
+zipcode,year_in_community,env_quality,val_fish_habitat,val_drinking_water,val_coastal_water,val_flood_protection,val_agriculture,val_outdoor_rec_summer,val_outdoor_rec_winter,val_fall_foliage,val_forest_climate_protection,val_forest_wood,val_forest_biodiversity,7a,7b,7c,7d,7e,7f,7g,7h,7i,7j,7k,7l,birth_year,gender,education,politics,race,adults_in_household,children_in_household,income,ESmean,frac_children
+03234,10,2,3,5,4,2,3,5,4,3,3,3,3,1,-1,-2,1,0,1,0,-2,2,-2,2,2,1956,Male,Bachelors,Moderate,White,0,0,"More than $100,000 per year",3.4545454545454546,NA
+03301,18,2,4,5,5,3,5,5,4,5,5,5,5,2,-2,-2,-2,-2,1,1,-1,2,-2,2,2,1963,Female,Gradutate Degree,Liberal,White,1,1,"$75,001 to $100,000 per year",4.636363636363637,0.5
+03104,22,1,5,5,5,5,4,5,1,3,5,4,4,2,-1,-2,-2,-2,2,2,2,2,-2,2,2,1958,Male,Bachelors,Prefer Not to Answer,White,2,0,"$75,001 to $100,000 per year",4.181818181818182,0
+03104,22,2,5,5,5,5,5,5,5,5,5,4,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1951,Female,Bachelors,Liberal,White,2,0,"More than $100,000 per year",4.909090909090909,0
+03303,5,1,5,5,4,4,4,5,3,4,4,4,4,2,-1,-2,-2,-1,-1,2,-1,-2,-2,2,-2,1954,Female,Some College,Liberal,White,2,0,"$25,001 to $50,000 per year",4.181818181818182,0
+03106,16,2,5,5,5,5,5,4,3,4,4,4,4,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1969,Female,Bachelors,Conservative,White,2,2,"More than $100,000 per year",4.363636363636363,0.5
+03440,7,2,5,5,5,4,5,5,5,5,5,3,5,2,-1,-1,-2,2,1,0,0,2,-2,2,2,1962,Female,High School,Moderate,White,2,1,"$25,001 to $50,000 per year",4.7272727272727275,0.3333333333333333
+03301,8,1,4,5,5,4,5,4,3,4,5,4,4,1,-1,-2,2,-1,1,-1,0,1,NA,1,2,1969,Female,Gradutate Degree,Slightly Liberal,White,2,2,"More than $100,000 per year",4.2727272727272725,0.5
+03230,26,1,5,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1942,Female,Bachelors,Liberal,White,2,NA,"$50,001 to $75,000 per year",5,NA
+03223,3,2,5,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1952,Female,Bachelors,Liberal,White,1,0,"Less than $25,000 per year",5,0
+03103,3,0,5,5,5,4,4,2,2,3,5,3,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1979,Male,High School,Prefer Not to Answer,White,1,0,"$25,001 to $50,000 per year",3.909090909090909,0
+03032,35,1,5,5,4,3,4,3,2,5,4,4,3,1,-1,-1,1,-2,0,0,-1,2,-2,2,1,1956,Male,Some College,Conservative,White,2,0,"$50,001 to $75,000 per year",3.8181818181818183,0
+03442,28,1,4,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-2,1,1,-1,2,-2,2,2,1954,Female,Bachelors,Liberal,White,2,0,"$75,001 to $100,000 per year",4.909090909090909,0
+03301,44,1,5,5,5,5,5,5,5,4,5,3,5,2,-2,-2,-2,-2,1,2,-2,2,-2,2,1,1971,Female,Some College,Moderate,White,3,0,"$25,001 to $50,000 per year",4.7272727272727275,0
+03045,22,1,4,5,4,5,4,5,5,3,5,4,3,2,-2,0,-1,-1,2,1,0,1,-1,1,-2,1964,Female,Gradutate Degree,Slightly Liberal,White,2,3,"More than $100,000 per year",4.2727272727272725,0.6
+03279,15,2,3,5,4,4,2,4,3,3,4,2,2,2,-2,-2,-2,-1,1,1,-2,2,-2,2,2,1959,Female,Some College,Slightly Conservative,White,3,0,"$75,001 to $100,000 per year",3.272727272727273,0
+03276,4,2,3,5,4,4,5,5,5,5,5,2,3,2,-2,-2,-2,-2,2,0,-2,2,-2,2,2,1992,Male,Some College,Liberal,White,2,0,"$25,001 to $50,000 per year",4.181818181818182,0
+03276,9,1,4,5,5,3,5,5,5,5,5,2,4,2,-2,-2,-2,0,2,2,-1,2,-2,1,2,1978,Female,Some College,Prefer Not to Answer,White,4,1,"$75,001 to $100,000 per year",4.363636363636363,0.2
+03037,45,2,5,5,5,4,4,4,4,4,5,4,4,-2,-2,-2,-2,-2,2,2,-2,2,-2,-2,2,1948,Male,Gradutate Degree,Moderate,White,2,NA,"More than $100,000 per year",4.363636363636363,NA
+03106,18,0,5,5,5,5,5,4,4,5,5,NA,5,0,-2,-2,-2,-2,2,1,0,2,-2,1,1,1997,Male,High School,Extremely Liberal,Other,4,0,"$75,001 to $100,000 per year",NA,0
+03224,9,2,5,5,4,5,5,4,4,4,5,5,5,2,-2,-2,-2,-2,2,1,-2,2,-2,2,2,1963,Female,Gradutate Degree,Liberal,White,2,0,"$75,001 to $100,000 per year",4.636363636363637,0
+03303,4,0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+03257,25,2,4,4,2,3,3,5,3,2,4,3,5,2,-2,-1,-2,-2,1,2,-1,2,-2,2,2,1959,Male,Gradutate Degree,Slightly Liberal,White,1,0,"$25,001 to $50,000 per year",3.4545454545454546,0
+03054,16,2,5,5,4,4,5,4,5,5,4,4,5,1,-1,-1,-1,-2,0,1,-1,1,-1,2,1,1964,Male,Gradutate Degree,Conservative,White,3,NA,"More than $100,000 per year",4.545454545454546,NA
+03234,22,1,5,4,5,4,5,5,4,5,5,4,5,1,0,-1,-1,0,1,0,0,1,0,1,2,NA,NA,NA,NA,NA,NA,NA,NA,4.636363636363637,NA
+03301,59,1,5,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1956,Female,Gradutate Degree,Liberal,White,1,0,"$25,001 to $50,000 per year",5,0
+03104,65,2,5,5,5,4,4,5,5,5,5,4,NA,1,-2,-2,-2,-2,2,0,1,2,2,2,2,1950,Female,Bachelors,Liberal,White,0,0,"$75,001 to $100,000 per year",NA,NA
+03104,59,1,5,5,5,5,5,5,5,5,5,5,5,2,2,-2,-2,-2,2,1,-2,2,-2,2,2,1955,Female,Some College,Slightly Liberal,White,3,0,"$50,001 to $75,000 per year",5,0
+03825,43,1,4,5,4,4,4,5,4,4,4,4,4,2,-1,-2,-2,-2,1,1,-2,2,-2,2,2,1950,Male,Bachelors,Extremely Liberal,White,2,0,"$50,001 to $75,000 per year",4.181818181818182,0
+03301,20,1,4,5,5,5,5,5,5,4,4,5,4,0,1,-1,-1,-1,0,1,-1,2,-1,1,1,1956,Male,Gradutate Degree,Moderate,White,2,0,"$75,001 to $100,000 per year",4.636363636363637,0
+03038,45,1,5,5,5,4,5,4,4,3,4,5,5,0,0,-2,2,-1,0,0,-1,2,-2,1,2,1962,Female,Some College,Prefer Not to Answer,White,3,1,"$75,001 to $100,000 per year",4.454545454545454,0.25
+03461,7,0,5,5,5,5,5,5,4,3,5,5,2,0,-1,-2,-2,-2,2,2,-1,2,-2,2,2,1983,Male,Gradutate Degree,Extremely Liberal,White,2,0,"Less than $25,000 per year",4.454545454545454,0
+03037,21,2,4,5,4,4,5,5,5,3,4,4,4,2,-2,-1,-2,0,1,0,-2,1,-1,1,-1,1968,Female,Gradutate Degree,Slightly Liberal,White,3,1,"More than $100,000 per year",4.2727272727272725,0.25
+03263,55,1,5,5,5,5,5,4,4,5,5,5,5,2,-2,-2,-2,-1,1,2,-2,2,-2,2,2,1930,Male,Gradutate Degree,Slightly Liberal,White,2,0,"$75,001 to $100,000 per year",4.818181818181818,0
+03106,14,0,5,5,5,4,5,5,2,4,5,5,4,2,-2,-2,-2,-2,1,1,-2,2,-2,2,2,1948,Male,Gradutate Degree,Moderate,White,1,0,"$50,001 to $75,000 per year",4.454545454545454,0
+03063,6,1,5,5,5,5,5,5,4,4,5,5,5,2,-2,-1,-2,-1,2,1,-1,2,-2,2,2,1965,Female,Gradutate Degree,Moderate,White,2,0,"$50,001 to $75,000 per year",4.818181818181818,0
+03103,17,1,4,4,4,4,4,4,4,4,4,4,4,2,0,-2,-2,2,0,0,0,2,-2,2,2,1985,Male,Bachelors,Prefer Not to Answer,Prefer Not to Answer,2,1,Prefer Not to Answer,4,0.3333333333333333
+03104,50,0,5,5,5,5,5,5,5,2,5,5,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1937,Male,Gradutate Degree,Liberal,White,2,0,"$50,001 to $75,000 per year",4.7272727272727275,0
+03301,35,0,5,5,5,5,5,5,4,4,5,5,5,2,-1,-2,-2,-2,1,0,-2,1,-2,2,1,1956,Male,Some College,Slightly Conservative,White,1,0,"Less than $25,000 per year",4.818181818181818,0
+03301,43,1,5,5,4,4,4,5,3,2,NA,3,NA,2,-1,-1,-1,1,1,-1,0,1,-1,1,1,1948,Female,Gradutate Degree,Slightly Liberal,White,1,0,Prefer Not to Answer,NA,0
+03102,21,2,5,5,3,5,5,5,4,5,4,4,3,2,0,-1,-1,-2,0,0,0,1,-1,1,2,1970,Female,Some College,Moderate,White,2,2,"$50,001 to $75,000 per year",4.363636363636363,0.5
+03276,13,2,5,5,5,5,5,2,2,1,5,5,5,2,0,0,-2,-2,2,0,0,2,-2,2,2,1944,Male,Bachelors,Liberal,White,1,0,"Less than $25,000 per year",4.090909090909091,0
+03301,30,1,4,5,5,4,4,5,5,5,4,4,4,2,1,-2,-2,1,1,1,-1,2,-2,1,2,1948,Female,Bachelors,Liberal,White,1,NA,"$25,001 to $50,000 per year",4.454545454545454,NA
+03245,7,1,5,5,5,5,4,5,5,5,5,4,5,2,0,-2,-2,-1,1,0,0,2,-2,1,2,1944,Female,Bachelors,Slightly Conservative,White,1,0,Prefer Not to Answer,4.818181818181818,0
+03229,2,2,5,4,5,5,5,5,4,5,5,5,5,2,-1,-2,2,-2,1,-1,0,2,-2,2,2,1945,Male,Some College,Slightly Liberal,White,2,0,"$25,001 to $50,000 per year",4.818181818181818,0
+03303,15,1,5,5,5,5,5,5,5,5,4,4,5,1,-2,-2,-2,-2,1,2,-2,2,-2,2,2,1958,Female,Bachelors,Moderate,White,1,0,"$25,001 to $50,000 per year",4.818181818181818,0
+03275,4,1,4,5,5,3,5,5,5,5,5,3,5,2,-2,-2,-2,-1,-1,1,-2,2,-2,2,2,1939,Male,Gradutate Degree,Prefer Not to Answer,White,1,0,"$25,001 to $50,000 per year",4.545454545454546,0
+03275,13,1,5,5,5,5,5,4,4,4,5,4,5,2,2,-2,-2,-2,0,0,-2,2,-2,2,2,1951,Female,Bachelors,Prefer Not to Answer,White,2,0,"Less than $25,000 per year",4.636363636363637,0
+03242,1,1,4,5,4,4,4,3,2,3,4,4,4,2,-1,-2,-2,-1,2,1,0,2,-2,1,2,1964,Female,Some College,Moderate,White,1,0,"$25,001 to $50,000 per year",3.727272727272727,0
+03051,60,1,5,5,5,5,5,5,4,4,5,5,5,2,-2,-2,2,-2,2,1,-2,2,-2,2,2,1946,Female,Gradutate Degree,Moderate,White,1,0,"$25,001 to $50,000 per year",4.818181818181818,0
+03301,8,1,5,5,5,5,5,5,5,4,5,4,4,1,0,-1,-1,0,0,1,0,2,-2,1,2,1971,Male,Bachelors,Moderate,White,2,5,Prefer Not to Answer,4.7272727272727275,0.7142857142857143
+03275,27,1,5,5,5,4,5,5,4,5,5,5,5,2,-2,-2,-2,-2,2,0,-2,2,-2,2,2,1956,Female,Some College,Liberal,White,2,0,"$25,001 to $50,000 per year",4.818181818181818,0
+03103,34,1,5,5,4,4,4,4,4,4,4,4,5,0,-1,-1,0,-1,0,0,0,1,0,2,0,1952,Male,Some College,Moderate,White,2,0,"$25,001 to $50,000 per year",4.2727272727272725,0
+03103,28,1,5,5,5,5,5,5,5,3,5,4,3,2,-1,-1,-2,-1,0,NA,1,2,2,1,2,1962,Female,Some College,Slightly Conservative,White,2,NA,Prefer Not to Answer,4.545454545454546,NA
+03221,10,2,5,5,5,5,5,5,5,5,5,3,5,2,-2,-2,-2,-2,0,0,0,2,-2,2,2,1962,Female,Gradutate Degree,Liberal,White,2,1,"$50,001 to $75,000 per year",4.818181818181818,0.3333333333333333
+03110,6,2,3,5,4,4,5,4,5,4,5,4,5,2,-1,-2,-2,-1,0,1,-1,2,-2,2,2,1973,Male,Bachelors,Conservative,White,2,1,"More than $100,000 per year",4.363636363636363,0.3333333333333333
+03245,11,1,5,5,5,5,4,5,5,4,5,4,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,4.7272727272727275,NA
+03110,14,1,4,5,5,4,3,2,3,3,5,5,5,2,-1,-1,-2,1,0,1,0,1,-1,1,1,1996,Male,Some College,Slightly Liberal,Asian,4,0,"More than $100,000 per year",4,0
+03301,16,0,5,5,5,5,5,4,4,4,5,2,5,1,-2,-2,-2,-2,2,1,-2,2,-2,2,2,1959,Female,Bachelors,Extremely Liberal,White,1,NA,"$50,001 to $75,000 per year",4.454545454545454,NA
+03301,20,1,5,5,5,5,5,4,4,2,4,4,5,2,-2,-2,-2,-2,2,0,-2,2,-2,2,2,1955,Male,Gradutate Degree,Liberal,White,2,0,"More than $100,000 per year",4.363636363636363,0
+03223,42,1,3,4,5,5,4,3,2,3,4,5,4,0,-1,0,-1,0,-1,0,-2,1,-2,1,1,1945,Male,High School,Slightly Conservative,Prefer Not to Answer,2,0,"$75,001 to $100,000 per year",3.8181818181818183,0
+03045,16,0,4,5,4,4,5,4,4,4,4,4,4,1,-2,-2,-2,-2,0,1,0,2,-2,2,-2,1953,Male,Some College,Moderate,White,2,0,"$25,001 to $50,000 per year",4.181818181818182,0
+03045,35,1,5,5,5,5,5,4,3,3,5,4,4,2,-2,-2,2,-2,2,1,-1,2,-2,2,2,1946,Female,Bachelors,Slightly Liberal,White,1,0,"Less than $25,000 per year",4.363636363636363,0
+03303,12,1,4,5,4,4,5,5,2,2,4,4,4,1,-1,-2,-2,2,1,0,-1,2,-2,2,1,1968,Female,Bachelors,Liberal,White,2,2,"$50,001 to $75,000 per year",3.909090909090909,0.5
+03301,15,2,4,5,4,3,5,4,5,4,5,4,4,2,-2,-2,-2,-2,0,0,0,NA,-2,2,2,1963,Female,Bachelors,Extremely Liberal,White,1,0,"$50,001 to $75,000 per year",4.2727272727272725,0
+03301,30,1,4,5,5,5,4,5,4,5,5,3,5,2,-1,-2,-2,-2,1,0,-1,2,-2,2,2,1952,Male,Gradutate Degree,Liberal,White,3,0,"$75,001 to $100,000 per year",4.545454545454546,0
+03824,20,1,5,5,5,4,5,5,4,1,5,2,5,1,-2,-2,-2,-2,2,1,-2,2,-2,2,2,1995,Male,High School,Prefer Not to Answer,White,2,0,"Less than $25,000 per year",4.181818181818182,0
+03304,19,2,5,5,5,5,5,4,4,3,5,4,5,2,-2,-2,-2,-1,1,0,-2,2,-2,2,2,1994,Male,Some College,Prefer Not to Answer,White,3,0,"More than $100,000 per year",4.545454545454546,0
+03261,6,2,5,5,5,5,4,3,2,3,5,4,5,2,-1,-2,-2,-2,-1,1,-1,2,-2,1,0,1960,Male,Some College,Slightly Conservative,Other,2,0,"$50,001 to $75,000 per year",4.181818181818182,0
+03301,1,0,4,5,4,5,5,4,4,4,5,4,3,2,-1,-1,-2,-1,0,0,1,2,-2,1,2,1966,Female,Bachelors,Moderate,White,2,0,"$50,001 to $75,000 per year",4.2727272727272725,0
+03303,18,1,5,5,5,5,5,4,4,4,5,4,5,2,-1,-2,-2,-2,0,0,0,0,-2,2,2,1968,Female,Some College,Prefer Not to Answer,White,6,0,Prefer Not to Answer,4.636363636363637,0
+03229,20,1,5,5,5,4,5,4,4,4,4,4,4,1,-1,-1,-2,-2,1,1,-1,2,2,2,2,1963,Female,Gradutate Degree,Liberal,White,4,1,"More than $100,000 per year",4.363636363636363,0.2
+03224,10,1,5,5,5,4,4,5,5,4,5,3,4,2,-2,-1,-2,-2,2,1,-1,2,-2,2,2,1951,Male,Bachelors,Liberal,White,2,0,"More than $100,000 per year",4.454545454545454,0
+03304,5,2,5,5,5,4,5,4,4,3,5,3,5,2,0,-2,-2,-2,2,-1,-1,2,-1,2,2,1969,Male,Some College,Slightly Conservative,NA,NA,NA,NA,4.363636363636363,NA
+03303,7,2,4,5,5,5,4,5,5,5,5,4,5,2,-1,-2,-2,-2,2,NA,0,2,-2,1,2,1942,Male,Gradutate Degree,Liberal,Asian,1,0,"$50,001 to $75,000 per year",4.7272727272727275,0
+03301,5,1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+03077,5,1,4,5,5,4,4,3,3,1,5,5,5,2,-1,-1,-1,-2,0,0,-1,2,-2,0,2,1964,Male,High School,Conservative,White,2,0,"$50,001 to $75,000 per year",4,0
+03303,10,1,5,5,5,5,5,5,5,5,5,3,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1960,Female,Bachelors,Liberal,White,1,NA,"$50,001 to $75,000 per year",4.818181818181818,NA
+03301,38,1,4,5,5,5,5,5,5,5,5,5,4,2,-1,-2,-2,-1,1,2,-1,1,-1,2,1,1952,Female,Gradutate Degree,Slightly Conservative,White,2,0,"$50,001 to $75,000 per year",4.818181818181818,0
+03038,38,2,5,5,5,5,5,5,5,5,5,5,5,1,-2,-2,-2,-2,2,1,-2,1,-2,2,2,1976,Female,Some College,Conservative,White,2,4,"$50,001 to $75,000 per year",5,0.6666666666666666
+03281,18,2,5,5,5,5,5,5,5,5,5,5,5,-2,-1,-2,-2,-2,2,2,-1,2,-2,2,2,1954,Male,Gradutate Degree,Conservative,White,1,0,Prefer Not to Answer,5,0
+03261,3,2,5,5,5,3,4,4,4,4,5,4,5,2,-2,-2,-2,-2,0,2,-2,2,-2,2,2,1982,Female,Some College,Prefer Not to Answer,White,3,1,"$25,001 to $50,000 per year",4.363636363636363,0.25
+00,28,2,4,5,5,5,5,5,3,5,4,4,3,1,-2,-1,-1,1,-1,0,-1,1,0,0,1,1949,Male,Bachelors,Moderate,White,2,0,"$75,001 to $100,000 per year",4.363636363636363,0
+03263,10,1,5,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-2,2,1,1,2,-2,1,2,1970,Female,Bachelors,Slightly Liberal,White,2,NA,"Less than $25,000 per year",5,NA
+03902,12,1,5,5,5,4,5,4,3,4,5,4,5,1,-1,-2,1,-2,2,1,0,2,2,1,-1,1957,Male,Some College,Slightly Conservative,White,2,0,"$50,001 to $75,000 per year",4.454545454545454,0
+03102,30,1,4,4,4,4,4,4,4,4,4,4,4,2,-1,-1,-1,-1,2,0,-1,2,-1,2,2,1960,Female,Gradutate Degree,Conservative,White,3,1,"$50,001 to $75,000 per year",4,0.25
+03431,2,1,5,5,4,4,4,5,5,4,4,4,4,2,-2,-2,-2,-2,2,2,-1,2,-2,2,2,1988,Female,Bachelors,Moderate,White,3,0,"$25,001 to $50,000 per year",4.363636363636363,0
+03301,2,1,4,5,3,3,3,5,4,4,4,3,3,2,-2,-1,-1,-2,-1,0,-1,1,-2,1,1,1979,Female,Gradutate Degree,Slightly Liberal,White,2,1,"$75,001 to $100,000 per year",3.727272727272727,0.3333333333333333
+03301,32,1,4,5,5,5,5,4,4,4,5,4,4,2,-2,-2,-2,-2,2,0,-2,2,-2,2,2,1951,Female,Gradutate Degree,Extremely Liberal,White,2,0,"$75,001 to $100,000 per year",4.454545454545454,0
+03103,29,2,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+03281,32,1,5,4,5,4,4,3,3,4,5,3,5,1,-2,-2,-2,-1,1,1,-1,1,-2,2,2,1948,Male,High School,Moderate,White,2,0,"Less than $25,000 per year",4.090909090909091,0
+03281,32,1,5,5,5,4,5,3,3,3,5,4,5,2,-2,-2,-2,-2,1,1,-2,2,-2,2,2,1964,Female,High School,Moderate,White,2,0,"Less than $25,000 per year",4.2727272727272725,0
+03303,10,1,3,5,3,4,3,4,4,3,5,4,5,1,-2,-2,-2,-2,1,1,-1,2,-2,2,2,1951,Male,Some College,Slightly Liberal,White,2,0,"$50,001 to $75,000 per year",3.909090909090909,0
+03301,6,2,5,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-2,1,1,-1,2,-2,2,2,1964,Female,Some College,Liberal,White,1,0,"$25,001 to $50,000 per year",5,0
+03307,20,2,5,5,4,3,5,5,5,4,4,4,4,1,-1,-1,-1,0,1,0,-1,1,-1,1,1,1947,Male,Gradutate Degree,Slightly Conservative,Prefer Not to Answer,3,0,Prefer Not to Answer,4.363636363636363,0
+03278,26,2,4,5,4,3,4,3,3,3,3,1,4,1,-1,-1,-2,-2,0,1,0,1,-2,1,2,1958,Female,Gradutate Degree,Moderate,White,2,0,"$50,001 to $75,000 per year",3.3636363636363638,0
+03303,4,1,4,5,5,3,5,5,5,3,5,3,4,2,-1,-1,-1,-2,1,0,-1,2,-2,2,2,1982,Male,Bachelors,Prefer Not to Answer,White,2,NA,"$75,001 to $100,000 per year",4.2727272727272725,NA
+03220,37,1,4,5,4,5,4,4,4,5,4,5,4,2,-2,-2,-2,-2,-2,1,-2,2,-2,2,2,1933,Male,Bachelors,Moderate,White,1,0,Prefer Not to Answer,4.363636363636363,0
+03043,15,2,5,5,5,5,4,5,5,3,5,5,5,-2,-2,-2,-2,-2,1,-1,-2,-2,-2,-2,2,1949,Male,Bachelors,Liberal,White,2,0,"$50,001 to $75,000 per year",4.7272727272727275,0
+03301,15,0,5,5,5,5,5,5,4,4,5,4,5,2,-1,-2,-2,-2,1,0,-1,2,-2,-2,2,1977,Male,Bachelors,Conservative,White,3,2,"More than $100,000 per year",4.7272727272727275,0.4
+03224,23,2,5,5,5,4,5,5,5,5,5,4,4,1,-2,-2,-2,0,1,1,-2,2,-2,2,2,1954,Male,Gradutate Degree,Moderate,White,3,0,"More than $100,000 per year",4.7272727272727275,0
+03458,40,2,3,5,5,4,4,5,3,3,5,2,4,2,-1,-2,-2,1,2,0,-2,2,-2,1,2,1950,Female,Bachelors,Slightly Liberal,White,2,NA,"$25,001 to $50,000 per year",3.909090909090909,NA
+03301,5,1,5,5,5,5,5,3,3,3,5,3,5,2,-2,-2,-2,-1,1,2,-1,2,-2,2,2,1963,Female,Bachelors,Liberal,White,3,0,"$25,001 to $50,000 per year",4.2727272727272725,0
+03281,2,2,5,5,5,4,5,4,3,4,5,3,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1954,Female,Gradutate Degree,Liberal,White,2,NA,"More than $100,000 per year",4.363636363636363,NA
+03229,11,1,5,5,5,4,5,5,4,5,5,5,4,1,-1,2,-2,-2,0,1,-1,1,2,2,1,1961,Male,Bachelors,Moderate,White,2,1,"More than $100,000 per year",4.7272727272727275,0.3333333333333333
+03301,40,2,4,5,5,4,4,4,2,3,4,4,4,2,-2,-2,-1,0,1,0,-2,2,-2,-1,2,1947,Female,Gradutate Degree,Liberal,White,2,0,"More than $100,000 per year",3.909090909090909,0
+03303,13,1,5,5,4,4,5,5,4,3,4,3,5,1,-1,-1,-2,-1,1,-2,-2,1,-2,2,2,1965,Male,Bachelors,Liberal,White,1,0,"Less than $25,000 per year",4.2727272727272725,0
+03221,30,1,3,5,5,4,5,5,3,4,4,4,5,1,-1,-1,-2,-2,0,0,-2,2,-2,2,2,1951,Female,Bachelors,Liberal,White,2,0,"$25,001 to $50,000 per year",4.2727272727272725,0
+03245,21,1,5,5,5,5,4,3,2,3,5,4,5,2,-2,-2,-2,-2,2,1,-2,2,-2,2,1,1955,Female,Gradutate Degree,Liberal,White,2,0,"$25,001 to $50,000 per year",4.181818181818182,0
+03246,50,1,3,4,2,3,4,2,2,2,3,3,3,2,-1,-2,-2,-1,0,0,-1,2,-2,2,2,1961,Female,Bachelors,Slightly Liberal,White,2,0,"$25,001 to $50,000 per year",2.8181818181818183,0
+03222,0,1,5,5,5,4,5,3,3,2,4,3,5,2,-1,-2,-2,-2,2,1,-2,2,-2,2,2,1997,Female,High School,Moderate,Hispanic,3,1,"$25,001 to $50,000 per year",4,0.25
+03307,48,0,5,5,5,5,5,5,3,4,5,4,4,2,-2,-2,-2,-1,1,1,-1,2,-2,2,2,1938,Male,Some College,Conservative,White,2,0,"More than $100,000 per year",4.545454545454546,0
+03235,13,1,5,5,5,5,4,4,4,4,5,3,5,2,-1,-2,-2,-2,1,1,-1,2,-2,2,2,1966,Female,High School,Slightly Conservative,White,2,2,"$50,001 to $75,000 per year",4.454545454545454,0.5
+03287,2,1,5,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-2,-1,1,-2,2,-2,2,NA,1971,Female,Some College,Moderate,White,2,2,"$75,001 to $100,000 per year",5,0.5
+03301,1,1,4,NA,5,4,5,NA,3,5,5,4,4,-2,-1,-2,-2,1,-2,2,-1,2,-2,2,-1,1941,Male,Gradutate Degree,Slightly Conservative,White,1,0,"$25,001 to $50,000 per year",NA,0
+03110,16,1,5,5,5,5,5,5,5,3,5,3,5,-2,-2,-2,-2,1,1,2,-2,2,-2,2,2,1969,Female,Some College,Moderate,White,5,0,"$75,001 to $100,000 per year",4.636363636363637,0
+03894,10,-1,4,5,4,5,5,5,5,3,5,5,5,2,1,-1,-2,-1,0,0,-1,2,-2,2,2,1947,Male,Gradutate Degree,Conservative,White,2,0,"More than $100,000 per year",4.636363636363637,0
+03220,23,2,4,5,5,5,5,5,4,4,5,5,5,1,-2,-2,-2,1,1,0,-2,1,-2,2,2,1952,Female,Gradutate Degree,Slightly Liberal,White,2,0,"$50,001 to $75,000 per year",4.7272727272727275,0
+03102,2,1,5,5,5,5,4,4,3,4,5,3,4,2,-2,-2,-2,-2,1,NA,-2,2,-2,-2,2,1964,Female,Bachelors,Prefer Not to Answer,Other,1,0,"Less than $25,000 per year",4.2727272727272725,0
+00,54,1,5,5,5,5,5,5,5,5,5,5,4,-2,-2,-2,-2,-2,2,2,-2,-2,-2,-2,-2,1957,Male,Bachelors,Slightly Liberal,White,1,0,"$75,001 to $100,000 per year",4.909090909090909,0
+03301,17,2,4,5,5,5,4,5,3,5,3,3,2,0,0,-1,-2,0,0,-1,0,0,-1,0,2,1964,Male,Bachelors,Conservative,White,3,1,"More than $100,000 per year",4,0.25
+03303,60,1,5,5,4,5,5,5,5,5,4,5,5,2,-2,-2,-2,-2,2,1,-2,-2,-2,-2,2,1954,Male,High School,Moderate,White,0,0,"Less than $25,000 per year",4.818181818181818,NA
+03301,10,1,5,5,5,4,3,2,2,2,5,2,5,2,-2,-2,-2,-2,2,1,-1,2,-2,2,-1,1972,Female,Bachelors,Liberal,White,1,0,"Less than $25,000 per year",3.6363636363636362,0
+03104,33,0,4,5,5,4,3,4,2,3,4,3,3,1,-1,-1,-2,-2,1,0,-1,1,-2,2,1,Prefer not to answer,Male,Bachelors,Prefer Not to Answer,Prefer Not to Answer,1,0,Prefer Not to Answer,3.6363636363636362,0
+03264,40,2,4,5,5,4,5,5,4,5,4,4,4,2,-2,-2,-2,-2,2,NA,NA,2,-2,2,2,1949,Female,Gradutate Degree,Slightly Conservative,White,2,0,"Less than $25,000 per year",4.454545454545454,0
+03034,15,2,5,5,5,1,4,5,1,5,5,5,3,1,-1,-1,-2,1,1,0,0,2,-2,1,2,1941,Male,Gradutate Degree,Conservative,Hispanic,2,0,"More than $100,000 per year",4,0
+03242,27,1,5,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-2,2,0,-2,2,-2,2,2,1961,Female,Gradutate Degree,Moderate,White,3,NA,"$25,001 to $50,000 per year",5,NA
+03303,24,2,5,5,5,5,5,5,4,5,5,5,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1952,Male,High School,Liberal,White,2,NA,"$75,001 to $100,000 per year",4.909090909090909,NA
+03258,1,1,3,5,5,5,5,4,4,4,5,5,5,1,-2,-2,-2,-1,2,1,-2,2,-2,2,2,1945,Female,Gradutate Degree,Extremely Liberal,White,3,3,Prefer Not to Answer,4.545454545454546,0.5
+03222,25,1,5,5,4,4,4,4,4,4,5,5,5,1,-2,-2,-2,-1,1,0,-1,1,-2,2,2,1962,Female,Bachelors,Slightly Conservative,White,3,NA,"$50,001 to $75,000 per year",4.454545454545454,NA
+03263,10,2,5,5,5,5,5,5,5,5,5,5,5,2,-1,-2,-2,-2,1,-1,0,2,-2,2,2,1968,Female,Some College,Prefer Not to Answer,White,2,NA,"$50,001 to $75,000 per year",5,NA
+03301,7,1,4,5,4,4,5,5,3,4,5,4,5,2,-2,-2,-2,-2,2,1,-2,2,2,2,1,1956,Female,Bachelors,Liberal,White,4,0,"$25,001 to $50,000 per year",4.363636363636363,0
+03102,34,1,5,5,5,5,4,4,5,3,5,4,5,1,-1,-2,-2,-1,1,2,-1,1,-1,1,2,1952,Male,High School,Moderate,White,3,0,"$75,001 to $100,000 per year",4.545454545454546,0
+03844,5,0,5,5,5,5,5,3,3,3,5,3,5,1,-2,-2,-2,-2,1,2,-1,2,-2,2,-2,1954,Male,Bachelors,Liberal,White,1,0,"$25,001 to $50,000 per year",4.2727272727272725,0
+03104,5,0,4,4,4,4,4,3,3,3,4,4,4,2,-2,-2,-2,-2,0,2,-2,2,-2,2,2,1961,Female,Some College,Moderate,White,1,0,"Less than $25,000 per year",3.727272727272727,0
+03249,2,-1,5,5,5,5,5,3,1,1,5,1,5,2,-2,-2,2,-2,2,2,-2,2,-2,2,2,1973,Male,High School,Moderate,White,2,2,"$50,001 to $75,000 per year",3.727272727272727,0.5
+03303,7,1,5,5,5,5,5,5,4,5,4,5,4,2,2,-2,-2,-2,2,2,-2,2,-2,2,2,1957,Male,Bachelors,Moderate,White,2,0,"More than $100,000 per year",4.7272727272727275,0
+03217,15,0,5,5,4,4,5,3,3,2,5,4,5,1,-2,-2,-2,-2,2,1,-1,2,-2,2,2,1975,Female,NA,Moderate,White,2,2,"More than $100,000 per year",4.090909090909091,0.5
+03229,25,1,5,5,5,5,5,5,5,5,5,5,5,-2,-2,-2,-2,-2,2,0,-2,2,-2,2,2,1949,Female,Gradutate Degree,Moderate,White,2,0,Prefer Not to Answer,5,0
+03252,75,1,4,5,4,5,4,4,3,3,5,4,4,2,-2,2,-2,-2,0,NA,-2,2,-2,-2,2,1940,Male,High School,Slightly Conservative,White,2,0,"Less than $25,000 per year",4.090909090909091,0
+03046,22,2,4,5,4,4,4,4,3,3,5,4,5,2,-1,-2,-2,-2,2,2,-1,2,-1,2,2,1993,Male,Bachelors,Liberal,White,3,0,"$50,001 to $75,000 per year",4.090909090909091,0
+03104,13,2,5,5,5,5,5,5,4,4,5,5,4,2,-1,-2,-2,-2,2,1,-1,2,-2,2,2,1939,Male,Bachelors,Conservative,White,2,0,"$75,001 to $100,000 per year",4.7272727272727275,0
+03258,30,1,3,5,4,2,4,4,4,3,5,3,4,2,-2,-2,-2,0,2,2,-2,2,-2,1,2,1930,Male,Gradutate Degree,Slightly Conservative,White,4,0,"$50,001 to $75,000 per year",3.727272727272727,0
+03103,15,2,5,5,5,3,5,5,4,2,5,3,5,2,-2,-2,-2,-2,1,1,0,1,-2,2,2,1957,Female,Some College,Liberal,White,3,1,"$50,001 to $75,000 per year",4.2727272727272725,0.25
+03237,18,1,5,5,5,5,5,3,3,5,5,4,5,2,-1,1,-2,-2,2,1,-2,2,-2,2,2,1959,Female,Gradutate Degree,Slightly Liberal,White,2,0,"$50,001 to $75,000 per year",4.545454545454546,0
+03104,23,0,5,4,5,5,5,5,3,4,5,5,4,2,-2,-2,-2,-2,1,-1,-2,2,-1,1,2,1940,Male,Bachelors,Slightly Conservative,White,4,1,"$75,001 to $100,000 per year",4.545454545454546,0.2
+00,30,1,5,5,5,5,5,5,5,3,5,5,5,2,-2,-2,-2,-2,2,1,-2,2,-2,2,2,1955,Female,Gradutate Degree,Moderate,White,3,1,"More than $100,000 per year",4.818181818181818,0.25
+03235,30,1,5,5,5,5,5,4,3,4,5,4,5,2,-2,-2,-2,-2,2,0,-2,2,-2,2,2,1956,Female,Gradutate Degree,Extremely Liberal,White,2,0,"$75,001 to $100,000 per year",4.545454545454546,0
+03038,16,1,5,5,5,1,3,5,5,5,4,4,5,2,-2,-2,-2,-2,2,2,-1,2,-2,2,2,1966,Male,Gradutate Degree,Liberal,White,2,1,"More than $100,000 per year",4.2727272727272725,0.3333333333333333
+03856,12,1,4,5,5,4,4,5,3,3,5,4,4,0,-2,-1,-2,-1,0,0,-1,-1,-2,-1,0,1951,Female,Gradutate Degree,Moderate,White,2,0,Prefer Not to Answer,4.181818181818182,0
+03301,40,1,4,5,5,4,5,4,4,4,5,3,5,1,-2,-2,-2,-1,2,0,-2,2,-2,2,2,1946,Female,Some College,Liberal,White,2,NA,"$50,001 to $75,000 per year",4.363636363636363,NA
+03301,40,1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+012180,30,1,4,5,4,4,5,4,4,4,1,4,4,2,-1,1,1,0,NA,NA,1,NA,-1,2,1,1957,Male,Some College,Prefer Not to Answer,Prefer Not to Answer,3,0,"$50,001 to $75,000 per year",3.909090909090909,0
+03301,20,2,5,5,5,3,5,4,4,4,5,5,5,0,-2,-2,-2,1,1,1,-1,2,-2,2,1,1953,Male,Bachelors,Extremely Liberal,White,2,0,"$50,001 to $75,000 per year",4.545454545454546,0
+03304,8,1,5,5,4,4,4,5,5,5,4,3,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1944,Male,Gradutate Degree,Liberal,White,2,0,"$50,001 to $75,000 per year",4.454545454545454,0
+03235,28,1,5,5,5,5,5,3,3,3,5,4,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1958,Female,Gradutate Degree,Conservative,White,2,1,Prefer Not to Answer,4.363636363636363,0.3333333333333333
+03301,4,0,4,5,5,5,5,4,4,3,5,3,4,2,-2,-2,-2,-2,2,NA,-2,2,-2,2,2,1964,Female,Gradutate Degree,Prefer Not to Answer,Hispanic,2,0,Prefer Not to Answer,4.2727272727272725,0
+03229,3,2,5,5,5,5,5,4,4,4,5,4,5,1,1,-2,-2,0,1,0,-2,1,-2,2,2,1950,Female,Gradutate Degree,Extremely Liberal,White,0,0,Prefer Not to Answer,4.636363636363637,NA
+03837,33,2,4,5,5,5,4,5,4,3,5,4,4,1,-1,-2,-2,-2,1,NA,NA,2,-2,2,2,1952,Female,Gradutate Degree,Moderate,White,1,0,"$25,001 to $50,000 per year",4.363636363636363,0
+03258,28,1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+03046,32,1,5,5,4,5,4,4,4,4,5,4,4,2,-2,-2,-2,0,2,2,-2,2,-2,1,2,1951,Female,Gradutate Degree,Liberal,White,2,0,Prefer Not to Answer,4.363636363636363,0
+03301,40,2,5,5,5,5,5,5,3,2,5,4,5,1,-2,-2,-2,-1,2,1,-2,2,-2,-1,2,1946,Male,Gradutate Degree,Liberal,White,1,0,"More than $100,000 per year",4.454545454545454,0
+03301,36,1,4,5,5,5,5,4,5,4,4,4,4,2,-2,-1,2,-2,2,-2,-1,2,-2,2,2,1945,Female,Gradutate Degree,Liberal,White,3,NA,Prefer Not to Answer,4.454545454545454,NA
+03244,7,1,4,5,3,4,4,4,4,4,4,4,4,1,1,-1,-2,-1,1,-1,0,1,-2,1,2,1962,Female,Some College,Conservative,White,1,1,"$25,001 to $50,000 per year",4,0.5
+03103,10,0,4,5,4,5,5,5,5,5,5,5,4,NA,-2,-2,-2,-2,2,NA,-2,NA,-2,2,NA,1975,Female,Some College,Conservative,White,3,0,"$50,001 to $75,000 per year",4.7272727272727275,0
+03303,25,2,5,5,5,5,5,5,5,5,5,4,5,0,-1,-2,1,-1,1,2,-2,2,-2,2,2,1962,Female,Some College,Liberal,White,2,NA,"More than $100,000 per year",4.909090909090909,NA
+03045,15,2,5,5,5,5,5,4,4,3,5,3,4,2,-2,-2,-2,-2,2,1,-2,2,-2,2,2,1978,Female,Bachelors,Liberal,White,4,2,Prefer Not to Answer,4.363636363636363,0.3333333333333333
+03104,13,2,5,5,5,4,4,5,3,5,5,3,4,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1968,Female,Some College,Moderate,White,1,1,"$25,001 to $50,000 per year",4.363636363636363,0.5
+03104,25,0,5,5,5,3,5,3,3,5,5,1,5,2,-2,-2,-2,-2,2,-1,-2,2,-2,2,2,1951,Female,Some College,Extremely Liberal,White,1,0,"Less than $25,000 per year",4.090909090909091,0
+03031,7,0,5,5,5,4,4,4,3,4,5,2,5,2,-1,-1,-1,-1,-1,1,-1,2,-1,1,1,1985,Female,Gradutate Degree,Moderate,White,3,0,"More than $100,000 per year",4.181818181818182,0
+03063,20,-1,4,5,5,3,4,5,5,1,5,3,4,2,-2,-2,-2,-2,-2,1,-1,2,-2,2,2,1967,Male,Some College,Slightly Conservative,White,1,2,"$50,001 to $75,000 per year",4,0.6666666666666666
+03301,1,1,4,5,5,5,5,5,4,2,5,4,4,2,-2,-2,-2,-1,2,1,-2,2,-2,2,2,1952,Female,Bachelors,Liberal,White,2,0,"$50,001 to $75,000 per year",4.363636363636363,0
+03301,11,2,4,5,3,2,5,4,4,2,4,3,3,2,-1,-2,-2,-2,0,0,-1,2,-2,0,2,1960,Male,Gradutate Degree,Moderate,White,2,3,"More than $100,000 per year",3.5454545454545454,0.6
+03235,3,1,5,5,5,5,5,5,5,4,4,4,5,2,-2,-2,-2,-2,1,1,-2,1,-2,0,1,1983,Female,Some College,Moderate,White,2,1,"$25,001 to $50,000 per year",4.7272727272727275,0.3333333333333333
+03301,8,1,4,5,5,4,5,5,5,4,5,4,5,2,-1,-1,2,-1,2,2,-1,2,-2,2,2,1975,Male,Gradutate Degree,Liberal,White,4,2,"More than $100,000 per year",4.636363636363637,0.3333333333333333
+03244,9,2,4,5,5,5,4,5,3,4,4,4,4,2,-2,-2,-2,-2,0,1,-1,2,-1,2,2,1960,Male,Some College,Moderate,White,1,0,"$50,001 to $75,000 per year",4.2727272727272725,0
+03301,20,0,5,5,5,5,5,4,4,4,5,4,5,2,-1,-2,-2,NA,2,0,-1,2,-2,2,2,1927,Female,Gradutate Degree,Prefer Not to Answer,Prefer Not to Answer,0,0,Prefer Not to Answer,4.636363636363637,NA
+03101,6,0,5,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1961,Male,Gradutate Degree,Moderate,White,2,0,"Less than $25,000 per year",5,0
+03301,64,1,4,5,5,4,5,5,5,3,5,5,4,2,0,-1,2,-1,-2,0,-2,2,-2,1,2,1950,Male,Some College,Prefer Not to Answer,White,2,0,"$50,001 to $75,000 per year",4.545454545454546,0
+03064,1,1,4,5,5,4,5,5,5,5,5,4,5,1,-2,-2,-2,-2,2,1,-1,2,-2,-2,2,1960,Female,Gradutate Degree,Extremely Liberal,White,4,0,Prefer Not to Answer,4.7272727272727275,0
+03249,30,1,5,5,5,5,5,5,5,3,5,4,5,2,-1,-2,-2,-1,1,0,-2,2,-2,2,NA,1956,Female,Bachelors,Moderate,White,3,0,"$25,001 to $50,000 per year",4.7272727272727275,0
+03221,11,1,5,5,5,4,4,4,3,4,5,4,5,1,-2,-2,-2,-2,1,2,-2,-2,-2,-2,2,1951,Female,Gradutate Degree,Liberal,White,2,0,"$25,001 to $50,000 per year",4.363636363636363,0
+03229,5,2,4,5,4,5,4,4,2,3,3,3,3,1,0,-1,-1,0,0,1,1,0,-1,1,1,1985,Male,Bachelors,Extremely Conservative,White,2,2,"$75,001 to $100,000 per year",3.6363636363636362,0.5
+03106,2,0,5,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-1,2,NA,-2,2,-2,2,2,1986,Female,Bachelors,Moderate,White,2,2,"$75,001 to $100,000 per year",5,0.5
+03782,15,2,5,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-2,2,2,-2,2,2,2,2,1977,Female,Gradutate Degree,Moderate,Prefer Not to Answer,4,2,Prefer Not to Answer,5,0.3333333333333333
+03301,2,1,5,5,5,5,5,4,4,4,5,4,5,1,-2,-2,-2,-1,1,1,-1,2,-2,1,2,1947,Female,Bachelors,Slightly Liberal,White,2,0,"$50,001 to $75,000 per year",4.636363636363637,0
+03301,23,1,5,5,5,5,5,5,3,4,4,5,4,1,-1,-1,-1,-1,1,0,-1,1,-2,1,2,1950,Male,Bachelors,Moderate,White,2,0,"$75,001 to $100,000 per year",4.545454545454546,0
+03301,20,1,5,5,5,5,5,4,4,5,5,4,4,1,-1,-2,-2,-1,0,0,-1,2,-1,2,2,1992,Male,Bachelors,Moderate,White,3,0,Prefer Not to Answer,4.636363636363637,0
+02346,1,0,5,5,4,4,4,3,3,3,4,4,4,1,-1,0,-1,0,1,0,0,2,-1,1,1,1968,Male,Some College,Moderate,White,3,NA,"$25,001 to $50,000 per year",3.909090909090909,NA
+03216,53,2,5,5,5,4,5,4,4,4,5,3,4,2,1,-2,-2,-2,2,0,-2,2,-2,2,2,1961,Female,Bachelors,Moderate,White,2,0,"$75,001 to $100,000 per year",4.363636363636363,0
+03301,40,0,5,5,5,4,3,4,4,3,5,4,5,2,-2,-2,-2,1,2,0,1,2,-2,2,2,1962,Female,Some College,Moderate,White,3,0,"$75,001 to $100,000 per year",4.2727272727272725,0
+03229,18,2,5,5,5,5,5,5,5,5,5,5,5,2,-2,0,-2,1,1,0,1,2,-1,2,2,1949,Male,Gradutate Degree,Conservative,White,1,0,"$75,001 to $100,000 per year",5,0
+03304,13,0,5,5,5,4,5,5,5,5,5,3,5,2,-2,-2,-2,-2,1,2,-2,2,-2,-2,2,1963,Female,Gradutate Degree,Slightly Liberal,White,3,1,"More than $100,000 per year",4.7272727272727275,0.25
+03275,20,1,3,4,4,5,4,4,4,2,4,4,4,2,-1,-2,-1,-1,0,0,-1,1,-2,2,2,1979,Female,Some College,Extremely Liberal,White,3,0,Prefer Not to Answer,3.8181818181818183,0
+03894,3,0,4,5,4,4,5,5,4,5,3,5,4,1,-1,-1,-1,-1,2,-1,0,-1,-2,1,2,1965,Prefer Not to Answer,High School,Slightly Conservative,White,2,0,"$25,001 to $50,000 per year",4.363636363636363,0
+03301,55,2,5,5,5,5,5,5,5,5,5,5,5,2,-2,-2,-2,-2,1,1,-2,2,-2,2,2,1955,Female,Gradutate Degree,Moderate,White,2,0,"$25,001 to $50,000 per year",5,0
+03301,25,1,5,5,4,4,5,4,4,3,4,4,5,2,-2,-2,-2,-1,1,1,-2,1,-2,1,2,1948,Female,Bachelors,Slightly Liberal,White,2,0,"$75,001 to $100,000 per year",4.2727272727272725,0
+03102,21,1,5,5,4,4,4,4,4,3,4,4,4,1,-1,-1,-1,0,0,0,0,2,-1,2,1,1993,Male,Some College,Liberal,White,2,0,"More than $100,000 per year",4.090909090909091,0
+03304,15,2,5,5,4,3,5,4,4,3,4,3,4,1,-1,-2,-2,2,0,1,-2,1,-1,1,2,1962,Female,Gradutate Degree,Conservative,White,2,NA,Prefer Not to Answer,4,NA
+03301,18,0,5,5,5,5,4,5,5,5,5,4,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1997,Female,High School,Moderate,White,4,1,"More than $100,000 per year",4.818181818181818,0.2
+03301,35,1,4,5,5,5,5,5,4,4,5,3,5,2,-2,-2,-2,-2,2,0,-1,2,-2,2,2,1953,Female,Gradutate Degree,Liberal,White,3,NA,"$75,001 to $100,000 per year",4.545454545454546,NA
+03307,20,1,4,5,4,2,5,5,4,3,4,4,3,2,-2,-2,-2,-2,0,0,2,2,-2,2,2,1949,Male,Bachelors,Slightly Liberal,White,1,1,"More than $100,000 per year",3.909090909090909,0.5
+03301,1,1,5,5,5,5,5,5,5,5,5,4,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1982,Female,Bachelors,Liberal,White,1,0,"$25,001 to $50,000 per year",4.909090909090909,0
+03224,28,1,3,1,4,4,4,3,4,4,4,3,NA,1,-1,-1,-2,0,0,1,-1,1,-2,0,2,1958,Female,Gradutate Degree,Slightly Liberal,White,1,0,Prefer Not to Answer,NA,0
+03106,12,1,4,4,3,5,4,2,2,3,4,5,4,1,2,-2,-2,-2,1,2,-1,2,-2,2,2,1976,Male,Gradutate Degree,Liberal,White,NA,2,"$50,001 to $75,000 per year",3.6363636363636362,NA
+03235,3,1,1,5,3,4,5,5,4,4,5,3,5,2,-2,-2,-2,-2,1,1,1,2,-2,2,2,1994,Female,Some College,Extremely Liberal,White,4,1,"$75,001 to $100,000 per year",4,0.2
+03304,22,1,4,5,4,4,5,5,5,1,4,4,4,2,-2,-2,-2,-1,-2,1,-2,2,-2,2,2,1954,Male,Gradutate Degree,Prefer Not to Answer,White,3,0,Prefer Not to Answer,4.090909090909091,0
+03307,18,1,5,5,5,5,5,4,4,4,5,4,5,2,-2,-2,-2,-2,2,2,-2,2,-2,2,2,1996,Female,Some College,Slightly Liberal,White,3,0,Prefer Not to Answer,4.636363636363637,0
+03046,36,1,4,5,5,4,4,5,4,4,5,4,5,1,-1,-2,-2,1,1,-1,2,2,2,1,2,1943,Male,Gradutate Degree,Liberal,White,2,0,"More than $100,000 per year",4.454545454545454,0
+03046,36,1,5,5,5,4,5,4,4,3,5,4,5,0,-2,-2,-2,-2,2,-1,-2,2,-2,2,2,1947,Female,Bachelors,Extremely Liberal,White,2,0,"More than $100,000 per year",4.454545454545454,0
+03237,10,1,4,5,5,2,3,4,4,5,4,3,3,1,1,-1,2,0,0,0,0,1,0,1,1,1955,Female,High School,Prefer Not to Answer,White,2,0,"$75,001 to $100,000 per year",3.8181818181818183,0
+03307,32,1,5,5,5,5,5,5,4,5,5,1,5,2,-1,-1,-2,-1,0,2,0,2,-1,1,2,1956,Female,Gradutate Degree,Slightly Conservative,White,3,0,"$75,001 to $100,000 per year",4.545454545454546,0
+03104,8,1,5,5,5,5,5,5,4,4,5,4,4,2,-2,-2,-2,-2,1,1,-2,2,-2,2,2,1949,Female,Bachelors,Slightly Liberal,White,3,1,"More than $100,000 per year",4.636363636363637,0.25
+03303,6,1,3,5,4,4,3,4,2,4,3,3,3,2,0,-2,-2,-1,1,0,0,1,-2,2,2,1962,Male,Gradutate Degree,Moderate,White,2,0,"$50,001 to $75,000 per year",3.4545454545454546,0
+03304,36,2,5,5,5,5,5,4,4,3,5,3,5,2,-2,-2,-2,-1,2,2,-2,2,-2,2,2,1947,Male,Gradutate Degree,Liberal,White,2,0,"$75,001 to $100,000 per year",4.454545454545454,0
+03281,43,0,4,5,5,4,4,5,5,4,5,3,5,2,-2,-2,-2,-2,2,2,-2,-2,-2,2,2,1946,Male,Bachelors,Slightly Liberal,Prefer Not to Answer,3,0,Prefer Not to Answer,4.454545454545454,0
+03301,4,1,5,5,5,4,5,4,4,3,3,4,4,0,-1,-2,-2,0,0,NA,0,0,-1,0,2,1947,Female,Some College,Conservative,White,1,0,"$75,001 to $100,000 per year",4.181818181818182,0
+03109,12,0,5,5,5,5,5,5,3,3,5,4,4,2,-2,-2,-2,-1,2,1,-2,2,-2,2,2,1955,Female,Some College,Conservative,White,0,0,"$25,001 to $50,000 per year",4.454545454545454,NA
+03104,2,1,5,5,5,5,5,5,3,3,3,5,5,2,-2,-2,-2,-2,0,0,0,0,-2,2,-2,1970,Female,Some College,Moderate,White,1,0,"$25,001 to $50,000 per year",4.454545454545454,0
+03301,30,1,5,5,5,4,5,5,5,4,5,5,5,2,-2,-2,-2,0,1,1,-1,2,-2,1,2,1957,Male,Bachelors,Slightly Conservative,White,2,0,"More than $100,000 per year",4.818181818181818,0
+03231,32,2,5,5,4,4,4,5,5,3,1,5,4,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,4.090909090909091,NA
+03102,34,0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+03104,24,0,4,5,5,5,4,4,3,3,5,3,4,2,-2,-2,-2,1,1,1,-1,2,1,1,2,1966,Male,Gradutate Degree,Slightly Liberal,White,2,0,"More than $100,000 per year",4.090909090909091,0
+03301,3,0,4,5,4,5,4,4,4,4,4,3,3,1,-1,-1,-1,1,1,1,-1,1,-1,-1,2,1935,Female,Gradutate Degree,Moderate,White,1,0,Prefer Not to Answer,4,0
+03303,1,2,5,5,5,5,5,5,5,5,4,5,5,2,-1,-1,-2,-2,1,2,-2,2,-2,2,2,1953,Male,Some College,Conservative,White,1,0,Prefer Not to Answer,4.909090909090909,0
+03244,23,0,5,5,5,4,3,2,1,2,2,2,5,1,-2,-2,-2,-1,2,0,-1,1,-2,2,2,1958,Male,Gradutate Degree,Slightly Liberal,White,3,0,"$25,001 to $50,000 per year",3.272727272727273,0
+03217,30,1,5,5,5,5,3,4,4,5,5,4,5,2,-1,-2,-2,-2,0,0,-2,2,-2,2,2,1929,Male,Gradutate Degree,Extremely Liberal,White,1,0,"$50,001 to $75,000 per year",4.545454545454546,0
+03303,1,1,5,5,3,4,5,4,2,4,5,4,5,2,-2,-1,-2,-1,2,1,-1,2,-2,2,2,1946,Male,Gradutate Degree,Liberal,White,0,0,"$50,001 to $75,000 per year",4.181818181818182,NA
+03301,16,2,4,5,4,4,5,4,3,3,5,4,4,2,-2,-2,-2,-2,0,0,-2,2,-2,1,2,1967,Female,Gradutate Degree,Liberal,White,2,2,"$50,001 to $75,000 per year",4.090909090909091,0.5
+03034,37,2,4,5,5,5,5,4,4,5,5,4,5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,4.636363636363637,NA
+03301,54,1,4,5,4,4,5,5,5,5,4,5,3,2,-2,-2,-2,-2,1,0,-2,2,-2,2,2,1961,Female,Some College,Conservative,White,4,0,Prefer Not to Answer,4.454545454545454,0
+03224,37,2,5,5,3,5,5,5,5,5,5,5,4,1,1,-1,-2,-1,2,2,-1,1,-2,2,-1,1951,Female,Gradutate Degree,Slightly Liberal,White,2,NA,"$50,001 to $75,000 per year",4.7272727272727275,NA
+03263,3,0,5,5,5,5,5,4,4,5,5,4,5,2,-1,-2,-2,0,0,0,-1,2,-2,1,2,1987,Female,Bachelors,Moderate,White,2,1,"More than $100,000 per year",4.7272727272727275,0.3333333333333333
+03224,26,2,5,5,5,5,4,5,5,5,5,3,4,2,-2,-2,-2,-1,2,1,-1,2,-2,2,2,1959,Male,Bachelors,Moderate,White,2,0,"More than $100,000 per year",4.636363636363637,0
+03301,43,0,4,5,4,5,4,5,4,4,5,4,5,1,-2,-1,-2,1,1,1,-1,2,-2,2,1,1952,Male,Gradutate Degree,Conservative,White,1,0,"$50,001 to $75,000 per year",4.454545454545454,0
+03046,8,0,4,5,4,3,5,5,5,4,4,3,4,1,-1,-2,-2,-2,0,0,1,1,-2,2,1,1953,Female,Gradutate Degree,Liberal,White,2,0,"$75,001 to $100,000 per year",4.181818181818182,0
+03046,8,1,4,5,4,5,4,5,5,4,5,3,4,1,-1,-2,-2,0,1,0,-2,1,-2,1,1,1949,Male,Some College,Moderate,White,2,0,"$75,001 to $100,000 per year",4.363636363636363,0
+03242,46,1,5,5,5,5,5,4,4,4,5,4,5,2,-2,-2,-2,-1,1,2,-2,2,-2,2,2,1941,Female,Bachelors,Slightly Liberal,Prefer Not to Answer,1,0,Prefer Not to Answer,4.636363636363637,0
+03303,25,1,2,3,2,4,3,5,5,4,4,3,3,2,-2,-2,-2,-2,2,0,-2,2,-2,2,2,1958,Male,Bachelors,Moderate,White,2,0,"$50,001 to $75,000 per year",3.4545454545454546,0
+03303,35,0,5,5,5,5,5,4,3,4,5,5,5,1,-2,-2,-2,-2,-1,1,-2,1,-1,2,1,1960,Female,Some College,Slightly Conservative,White,2,0,"$50,001 to $75,000 per year",4.636363636363637,0
+03244,20,1,4,5,4,4,4,4,3,3,4,4,4,2,-1,-2,-2,-1,1,1,-2,1,-1,2,2,1948,Male,Gradutate Degree,Liberal,White,1,0,"Less than $25,000 per year",3.909090909090909,0
