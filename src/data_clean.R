@@ -8,7 +8,6 @@ setwd(here::here())
 data <- read_csv("data/Data.csv") |>
   filter(!is.na(year_in_community)) |>
   mutate(zipcode = paste0("0", as.character(zipcode))) |>
-  mutate(search_county(state_abb = NH))
   mutate(across(starts_with("val"), ~case_when(
     . == "Unimportant" ~ 1,
     . == "Slight Importance" ~ 2,
@@ -26,7 +25,7 @@ data <- read_csv("data/Data.csv") |>
     . == "Strongly Agree" ~ 2,
     TRUE ~ NA
   ))) |>
-  mutate(env_quality = case_when(
+  mutate(env_quality = factor(
     env_quality == "Very Poor" ~ -2,
     env_quality == "Poor" ~ -1,
     env_quality == "Fair" ~ 0,
@@ -63,12 +62,9 @@ data <- read_csv("data/Data.csv") |>
                                    "$75,001 to $100,000 per year",
                                     "More than $100,000 per year",
                                     "Prefer Not to Answer"))) |>
-  mutate(frac_children = children_in_household/(children_in_household+adults_in_household)) 
+  mutate(frac_children = children_in_household/(children_in_household+adults_in_household))
 
-county_data <- reverse_zipcode(data$zipcode)  
 
-merged_data <- merge(data, county_data, by = "zipcode") |>
-  filter(state.x == "NH")
 ## Save R object 
 saveRDS(data, file = "out/clean_data.rds")
 
