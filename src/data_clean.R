@@ -25,7 +25,7 @@ data <- read_csv("data/Data.csv") |>
     . == "Strongly Agree" ~ 2,
     TRUE ~ NA
   ))) |>
-  mutate(env_quality = factor(
+  mutate(env_quality = case_when(
     env_quality == "Very Poor" ~ -2,
     env_quality == "Poor" ~ -1,
     env_quality == "Fair" ~ 0,

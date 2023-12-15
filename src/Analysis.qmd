@@ -1,0 +1,417 @@
+---
+title: "Analysis"
+format: html
+editor: visual
+---
+
+## Data Prep
+
+```{r}
+library(tidyverse)
+library(tigris)
+library(zipcodeR)
+library(sf)
+
+setwd(here::here())
+
+
+data <- read_csv("data/Data.csv") |>
+  filter(!is.na(year_in_community)) |>
+  mutate(zipcode = paste0("0", as.character(zipcode))) |>
+  mutate(across(starts_with("val"), ~case_when(
+    . == "Unimportant" ~ 1,
+    . == "Slight Importance" ~ 2,
+    . == "Moderately Important" ~ 3,
+    . == "Important" ~ 4,
+    . == "Very Important" ~ 5,
+    TRUE ~ NA
+  ))) |>
+  mutate(ESmean = rowMeans(across(starts_with("val")))) |>
+  mutate(across(starts_with("7"), ~case_when(
+    . == "Strongly Disagree" ~ -2,
+    . == "Somewhat Disagree" ~ -1,
+    . == "Neither Disagree nor Agree" ~ 0,
+    . == "Somewhat Agree" ~ 1,
+    . == "Strongly Agree" ~ 2,
+    TRUE ~ NA
+  ))) |>
+  mutate(env_quality = case_when(
+    env_quality == "Very Poor" ~ -2,
+    env_quality == "Poor" ~ -1,
+    env_quality == "Fair" ~ 0,
+    env_quality == "Good" ~ 1,
+    env_quality == "Very Good" ~ 2,
+    TRUE ~ NA
+  )) |>
+  mutate(politics = factor(politics, 
+                           levels = c("Extremely Liberal",
+                                      "Slightly Liberal",
+                                      "Liberal",
+                                      "Moderate",
+                                      "Slightly Conservative",
+                                      "Conservative",
+                                      "Extremely Conservative",
+                                      "Prefer Not to Answer"))) |>
+  mutate(education = case_when(
+    education == "High School (includes GED)" ~ "High School",
+    education == "Some College or Associate’s or Technical Degree" ~ "Some College",
+    education == "4-year College Degree (Bachelor’s)" ~ "Bachelors",
+    education == "Graduate or Professional Degree (Master’s, Ph.D., M.B.A., M.D., J.D., etc)" ~ "Gradutate Degree",
+    TRUE ~ NA
+  )) |>
+  mutate(education = factor(education, levels = c("Primary School",
+                                                 "High School",
+                                                 "Some College",
+                                                 "Bachelors",
+                                                 "Gradutate Degree",
+                                                 "Prefer Not to Answer"))) |>
+  mutate(income = factor(income,
+                         levels = c("Less than $25,000 per year",
+                                    "$25,001 to $50,000 per year",
+                                    "$50,001 to $75,000 per year",
+                                   "$75,001 to $100,000 per year",
+                                    "More than $100,000 per year",
+                                    "Prefer Not to Answer"))) |>
+  mutate(frac_children = children_in_household/(children_in_household+adults_in_household)) |>
+  mutate(education = case_when(
+      education == "Some College" ~ "High School",
+      education == "High School" ~ "High School",
+      education == "Bachelors" ~ "Bachelors",
+      education == "Gradutate Degree" ~ "Graduate Degree"
+  )) |>
+  mutate(env_quality = case_when(
+    env_quality == -1 ~ "Poor-Fair",
+    env_quality == 0 ~ "Poor-Fair",
+    env_quality == 1 ~ "Good",
+    env_quality == 2 ~ "Very Good"
+    ),
+    env_quality = factor(env_quality,
+                         levels = c("Poor-Fair", "Good", "Very Good"))
+  ) |>
+  rename("Fall_Foliage" = val_fall_foliage,
+         "Climate_Protection" = val_forest_climate_protection,
+         "Wood" = val_forest_wood,
+         "Biodiversity" = val_forest_biodiversity) |>
+  select(-starts_with("val"), -starts_with("7")) |>
+  
+  
+## now 1 = Less than "Important"
+## 2 = "Important"
+## 3 = "Very Important"
+  
+  
+  mutate(Fall_Foliage = case_when(
+    Fall_Foliage == 1 ~ 1,
+    Fall_Foliage == 2 ~ 1,
+    Fall_Foliage == 3 ~ 1,
+    Fall_Foliage == 4 ~ 2,
+    Fall_Foliage == 5 ~ 3
+  )) |>
+  mutate(Biodiversity = case_when(
+    Biodiversity == 1 ~ 1,
+    Biodiversity == 2 ~ 1,
+    Biodiversity == 3 ~ 1,
+    Biodiversity == 4 ~ 2,
+    Biodiversity == 5 ~ 3
+  )) |>   
+  mutate(Climate_Protection = case_when(
+    Climate_Protection == 1 ~ 1,
+    Climate_Protection == 2 ~ 1,
+    Climate_Protection == 3 ~ 1,
+    Climate_Protection == 4 ~ 2,
+    Climate_Protection == 5 ~ 3
+  )) |>
+  mutate(Wood = case_when(
+    Wood == 1 ~ 1,
+    Wood == 2 ~ 1,
+    Wood == 3 ~ 1,
+    Wood == 4 ~ 2,
+    Wood == 5 ~ 3
+  )) |>
+  mutate(politics = case_when(
+    politics == "Extremely Liberal" ~ "Liberal",
+    politics == "Slightly Liberal" ~  "Slightly Liberal",
+    politics == "Liberal" ~ "Liberal",
+    politics == "Moderate" ~ "Moderate",
+    politics == "Slightly Conservative" ~ "Slightly Conservative",
+    politics == "Conservative" ~ "Conservative",
+    politics == "Extremely Conservative" ~ "Conservative",
+    politics == "Prefer Not to Answer" ~ "Prefer Not to Answer")) |>
+  mutate(politics = factor(politics, 
+                           levels = c("Liberal",
+                                      "Slightly Liberal",
+                                      "Moderate",
+                                      "Slightly Conservative",
+                                      "Conservative",
+                                      "Prefer Not to Answer"))) |>
+  mutate(age = 2015 - as.numeric(birth_year))
+
+# Define percentile breaks (e.g., quartiles)
+percentile_breaks <- quantile(data$age, probs = seq(0, 1, by = 0.25), na.rm = TRUE)
+
+# Round breaks to whole numbers
+rounded_breaks <- round(percentile_breaks)
+
+# Create labels based on these breaks
+labels <- paste(head(rounded_breaks, -1), tail(rounded_breaks, -1) - 1, sep="-")  
+
+data$age_range <- cut(data$age, breaks = rounded_breaks, labels = labels, include.lowest = TRUE, right = FALSE)
+```
+
+## Wood
+
+```{r}
+
+WOOD <- data |>
+  select(-zipcode, -year_in_community, -Fall_Foliage, -Climate_Protection, 
+         -Biodiversity, -adults_in_household, -children_in_household,
+         -ESmean, -frac_children, -age, -birth_year) |>
+  na.omit() # N = 227
+
+
+#  filter(politics != "Prefer Not to Answer") |>
+ # filter(race != "Prefer Not to Answer") |>
+#  filter(gender != "Prefer Not to Answer") |>
+# Ordinal Linear Regression
+
+## env_qual alone
+#Ordered logistic regressions on each variable 
+wood_eq_polr = polr(factor(Wood) ~ env_quality, data = WOOD, Hess = TRUE)
+summary(wood_eq_polr)
+#Test Assumptions
+brant(wood_eq_polr)  #parallel regression assumption holds
+Anova(wood_eq_polr) #no significant difference across familiarity groups.
+
+
+## env_qual with education
+#Ordered logistic regressions on each variable 
+wood_eq_edu_polr = polr(factor(Wood) ~ env_quality + education, data = WOOD, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(income != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Wood) ~ env_quality + income, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(age_range != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Wood) ~ env_quality + age_range, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(race != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Wood) ~ env_quality + race, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(politics != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Wood) ~ env_quality + politics, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(gender != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Wood) ~ env_quality + gender, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+```
+
+## Foliage
+
+```{r}
+
+WOOD <- data |>
+  select(-zipcode, -year_in_community, -Wood, -Climate_Protection, 
+         -Biodiversity, -adults_in_household, -children_in_household,
+         -ESmean, -frac_children, -age, -birth_year) |>
+  na.omit() # N = 227
+
+
+#  filter(politics != "Prefer Not to Answer") |>
+ # filter(race != "Prefer Not to Answer") |>
+#  filter(gender != "Prefer Not to Answer") |>
+# Ordinal Linear Regression
+
+## env_qual alone
+#Ordered logistic regressions on each variable 
+wood_eq_polr = polr(factor(Fall_Foliage) ~ env_quality, data = WOOD, Hess = TRUE)
+summary(wood_eq_polr)
+#Test Assumptions
+brant(wood_eq_polr)  #parallel regression assumption holds
+Anova(wood_eq_polr) #no significant difference across familiarity groups.
+
+
+## env_qual with education
+#Ordered logistic regressions on each variable 
+wood_eq_edu_polr = polr(factor(Fall_Foliage) ~ env_quality + education, data = WOOD, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(income != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Fall_Foliage) ~ env_quality + income, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(age_range != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Fall_Foliage) ~ env_quality + age_range, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(race != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Fall_Foliage) ~ env_quality + race, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(politics != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Fall_Foliage) ~ env_quality + politics, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(gender != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Fall_Foliage) ~ env_quality + gender, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+```
+
+## Climate
+
+```{r}
+
+WOOD <- data |>
+  select(-zipcode, -year_in_community, -Wood, -Fall_Foliage, 
+         -Biodiversity, -adults_in_household, -children_in_household,
+         -ESmean, -frac_children, -age, -birth_year) |>
+  na.omit() # N = 227
+
+
+#  filter(politics != "Prefer Not to Answer") |>
+ # filter(race != "Prefer Not to Answer") |>
+#  filter(gender != "Prefer Not to Answer") |>
+# Ordinal Linear Regression
+
+## env_qual alone
+#Ordered logistic regressions on each variable 
+wood_eq_polr = polr(factor(Climate_Protection) ~ env_quality, data = WOOD, Hess = TRUE)
+summary(wood_eq_polr)
+#Test Assumptions
+brant(wood_eq_polr)  #parallel regression assumption holds
+Anova(wood_eq_polr) #no significant difference across familiarity groups.
+
+
+## env_qual with education
+#Ordered logistic regressions on each variable 
+wood_eq_edu_polr = polr(factor(Climate_Protection) ~ env_quality + education, data = WOOD, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(income != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Climate_Protection) ~ env_quality + income, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(age_range != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Climate_Protection) ~ env_quality + age_range, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(race != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Climate_Protection) ~ env_quality + race, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(politics != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Climate_Protection) ~ env_quality + politics, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+
+## env_qual with INCOME
+#Ordered logistic regressions on each variable 
+dat <- WOOD |>
+   filter(gender != "Prefer Not to Answer") 
+wood_eq_edu_polr = polr(factor(Climate_Protection) ~ env_quality + gender, data = dat, Hess = TRUE)
+summary(wood_eq_edu_polr)
+#Test Assumptions
+brant(wood_eq_edu_polr)  #parallel regression assumption holds
+Anova(wood_eq_edu_polr) #no significant difference across familiarity groups.
+```

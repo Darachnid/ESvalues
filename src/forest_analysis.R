@@ -26,14 +26,13 @@ data <- read_rds("out/clean_data.rds") |>
                         "Climate Protection",
                         "Wood",
                         "Biodiversity"), 
-               names_to = "ES_type",
+               names_to = "ES",
                values_to = "importance") |>
   mutate("age" = 2015 - as.numeric(birth_year)) |>
   select(-birth_year) |>
   mutate(politics = as.numeric(politics),
          education = as.numeric(education),
-         income = as.numeric(income)) |>
-  filter(income < 5 & politics < 8) 
+         income = as.numeric(income)) 
 
 #################################################################
 ########################## Initial Viz ########################## 
@@ -48,7 +47,7 @@ plot_es_years <- data |>
               width = 0.3) +
   stat_smooth(method = "lm", se = FALSE) +
   scale_color_colorblind() 
-plot_es_years + facet_wrap(~ES_type) 
+plot_es_years + facet_wrap(~ES) 
 
 ### Plot: ES importace by age
 plot_es_age <- data |> 
@@ -58,7 +57,7 @@ plot_es_age <- data |>
   geom_jitter() + 
   stat_smooth(method = "lm", se = FALSE) + 
   scale_color_colorblind() 
-plot_es_age + facet_wrap(~ES_type) 
+plot_es_age + facet_wrap(~ES) 
 
 ### Plot: ES importace by env_quality
 plot_es_env <- data |>
@@ -70,11 +69,11 @@ plot_es_env <- data |>
   stat_smooth(method = "lm",
               se = FALSE) +
   scale_color_colorblind()
-plot_es_env + facet_wrap(~ES_type)
+plot_es_env + facet_wrap(~ES)
 
 ### Plot: ES importace by income
 plot_es_income <- data |>
-  select(income, importance, ES_type, gender) |>
+  select(income, importance, ES, gender) |>
   na.omit() |>
   ggplot(aes(x = income,
              y = importance,
@@ -83,11 +82,11 @@ plot_es_income <- data |>
               width = 0.3) +
   stat_smooth(method = "lm", se = FALSE) +
   scale_color_colorblind()
-plot_es_income + facet_wrap(~ES_type)
+plot_es_income + facet_wrap(~ES)
 
 ### Plot: ES importace by education
 plot_es_edu <- data |>
-  select(education, importance, ES_type, gender) |>
+  select(education, importance, ES, gender) |>
   na.omit() |>
   ggplot(aes(x = education,
              color = gender,
@@ -96,11 +95,11 @@ plot_es_edu <- data |>
               width = 0.3) +
   stat_smooth(method = "lm", se = FALSE) +
   scale_color_colorblind()
-plot_es_edu + facet_wrap(~ES_type)
+plot_es_edu + facet_wrap(~ES)
 
 ### Plot: ES importace by politics
 plot_es_politics <- data |>
-  select(politics, importance, ES_type, gender) |>
+  select(politics, importance, ES, gender) |>
   na.omit() |>
   filter(politics != "Prefer Not to Answer") |>
   ggplot(aes(x = politics,
@@ -110,11 +109,11 @@ plot_es_politics <- data |>
               width = 0.3) +
   stat_smooth(method = "lm", se = FALSE) +
   scale_color_colorblind()
-plot_es_politics + facet_wrap(~ES_type)
+plot_es_politics + facet_wrap(~ES)
 
 ### Plot: ES importance by age, gender
 plot_es_age <- data |>
-  select(importance, age, gender, ES_type) |>
+  select(importance, age, gender, ES) |>
   filter(gender != "Prefer Not to Answer") |>
   na.omit() |>
   ggplot(aes(x = age,
@@ -125,12 +124,12 @@ plot_es_age <- data |>
   scale_color_colorblind() +
   stat_smooth(method = "lm", 
               se = FALSE)
-plot_es_age + facet_wrap(~ES_type)
+plot_es_age + facet_wrap(~ES)
 
 
 ### Plot: ES importance by years_in_community, gender
 plot_es_years <- data |>
-  select(importance, year_in_community, gender, ES_type) |>
+  select(importance, year_in_community, gender, ES) |>
   filter(gender != "Prefer Not to Answer") |>
   na.omit() |>
   ggplot(aes(x = year_in_community,
@@ -142,12 +141,12 @@ plot_es_years <- data |>
   scale_color_colorblind() +
   stat_smooth(method = "lm", 
               se = FALSE)
-plot_es_years + facet_wrap(~ES_type)
+plot_es_years + facet_wrap(~ES)
 
 ### Plot: ES importance by consideration_of_future_generations
 plot_es_considers <- data |>
   select(consideration_of_future_generations, importance,
-         ES_type) |>
+         ES) |>
   na.omit() |>
   ggplot(aes(x = consideration_of_future_generations,
              y = importance,
@@ -159,11 +158,12 @@ plot_es_considers <- data |>
   stat_summary(fun = mean, geom = "line", 
                color = "blue", size = 0.8,
                aes(group = 1)) 
-plot_es_considers + facet_wrap(~ES_type)
+plot_es_considers + facet_wrap(~ES)
+
 ### Plot: ES importance by disregard_of_future_generations
 plot_es_disregard <- data |>
   select(disregard_of_future_generations, importance,
-         ES_type) |>
+         ES) |>
   na.omit() |>
   ggplot(aes(x = disregard_of_future_generations,
              y = importance,
@@ -175,7 +175,7 @@ plot_es_disregard <- data |>
   stat_summary(fun = mean, geom = "line", 
                color = "blue", size = 0.8,
                aes(group = 1)) 
-plot_es_disregard + facet_wrap(~ES_type)
+plot_es_disregard + facet_wrap(~ES)
 
 ## Weird that they are both mode of -2 and they dont oppose
 ## I think its bc this question "8j" is a bit confusing w a double negative
@@ -184,14 +184,14 @@ plot_consider_disregard <- data |>
   ggplot(aes(x = disregard_of_future_generations,
              y = consideration_of_future_generations)) +
   geom_jitter() +
-  stat_smooth()
+  stat_smooth(method = "lm", se = FALSE)
 plot_consider_disregard
 
 plot_disregard_obligation <- data |>
   ggplot(aes(x = disregard_of_future_generations,
              y = obligation_to_future_generations)) +
   geom_jitter() +
-  stat_smooth()
+  stat_smooth(method = "lm", se = FALSE)
 plot_disregard_obligation 
 
 ## It seems obligation does oppose disregard so we should
@@ -200,14 +200,14 @@ plot_consider_obligation <- data |>
   ggplot(aes(x = consideration_of_future_generations,
              y = obligation_to_future_generations)) +
   geom_jitter() +
-  stat_smooth()
+  stat_smooth(method = "lm", se = FALSE)
 plot_consider_obligation 
 
 
 ### Plot: ES importance by obligation_to_future_generations
 plot_es_obligation <- data |>
   select(obligation_to_future_generations, importance,
-         ES_type, gender) |>
+         ES, gender) |>
   na.omit() |>
   ggplot(aes(x = obligation_to_future_generations,
              y = importance,
@@ -219,76 +219,7 @@ plot_es_obligation <- data |>
   stat_smooth(method = "lm", se = FALSE,
               aes(group = gender)) +
   scale_color_colorblind()
-plot_es_obligation + facet_wrap(~ES_type)
-
-
-
-### Plot: ES importace by years_in_community
-plot_es_years <- data |>
-  ggplot(aes(x = year_in_community,
-             y = importance,
-             color = gender)) +
-  geom_jitter(height = 0.3,
-              width = 0.3) +
-  stat_smooth(method = "lm", se = FALSE) +
-  scale_color_colorblind() +
-  labs(title = "Ecosystem Service Importance by Years in Community") 
-plot_es_years + facet_wrap(~ES_type)
-
-### Plot: ES importace by age
-plot_es_age <- data |>
-  ggplot(aes(x = age,
-             y = importance,
-             color = gender)) +
-  geom_jitter() +
-  stat_smooth(method = "lm", se = FALSE) +
-  scale_color_colorblind() +
-  labs(title = "Ecosystem Service Importance by Age")
-plot_es_age + facet_wrap(~ES_type)
-
-### Plot: ES importace by env_quality
-plot_es_env <- data |>
-  ggplot(aes(x = env_quality,
-             y = importance,
-             color = gender)) +
-  geom_jitter(height = 0.3,
-              width = 0.3) +
-  stat_smooth(method = "lm",
-              se = FALSE) +
-  scale_color_colorblind() +
-  labs(title = "Ecosystem Service Importance and Environmental Quality")
-plot_es_env + facet_wrap(~ES_type)
-
-### Plot: ES importace by income
-plot_es_income <- data |>
-  select(income, importance, ES_type, gender) |>
-  na.omit() |>
-  ggplot(aes(x = income,
-             y = importance,
-             color = gender)) +
-  geom_jitter(height = 0.3,
-              width = 0.3) +
-  stat_smooth(method = "lm", se = FALSE) +
-  scale_color_colorblind() +
-  labs(title = "Income and Its Influence on Ecosystem Service Valuation")
-plot_es_income + facet_wrap(~ES_type)
-
-### Plot: ES importace by education
-plot_es_edu <- data |>
-  select(education, importance, ES_type, gender) |>
-  na.omit() |>
-  ggplot(aes(x = education,
-             color = gender,
-             y = importance)) +
-  geom_jitter(height = 0.3,
-              width = 0.3) +
-  stat_smooth(method = "lm", se = FALSE) +
-  scale_color_colorblind() +
-  labs(title = "Educational Impact on Ecosystem Service Importance")
-plot_es_edu + facet_wrap(~ES_type)
-
-
-
+plot_es_obligation + facet_wrap(~ES)
 
 
 
